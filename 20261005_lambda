@@ -1,0 +1,246 @@
+うん、ここは一度 「ロール」と「ポリシー」を分けて考える と一気に分かりやすくなります。
+
+ざっくり言うと、
+
+* ロール = 誰として動くか、という“身分・役職”
+* ポリシー = その役職で何をしていいか、という“権限表”
+* 信頼ポリシー = 誰がその役職を使っていいか、という“利用条件”
+
+です。
+
+今回作る②は、LambdaExecutionRole という1つのロールです。そのロールに「信頼ポリシー」と「権限ポリシー」を設定します。
+
+LambdaExecutionRole  ← ロール
+│
+├─ Trust Policy
+│   └─ Lambdaがこのロールを使っていい
+│
+└─ Permissions Policy
+    ├─ CloudWatch Logsにログを書いていい
+    └─ Bedrockを呼んでいい
+
+1. ロール本体
+
+名前は例えばこれにします。
+
+LambdaBedrockExecutionRole
+
+これは Lambda実行用ロール です。
+
+人間がスイッチロールするためのものではなく、
+
+Lambda
+  ↓ このロールを借りる
+LambdaBedrockExecutionRole
+  ↓
+Bedrock
+
+という使われ方をします。
+
+⸻
+
+2. JSONその1：Trust Policy
+
+これは ロールに設定する「信頼ポリシー」 です。
+
+名前を付けて別ポリシーとして作るものではなく、LambdaBedrockExecutionRole の「信頼関係」に設定します。
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+
+意味は、
+
+AWS Lambdaさん、このロールを使っていいですよ
+
+です。
+
+つまりこれは、
+
+「誰がこのロールを使える？」
+       ↓
+Lambda
+
+を決めるJSONです。
+
+⸻
+
+3. JSONその2：Bedrockを使うためのポリシー
+
+これは 権限ポリシー です。
+
+こちらは名前を付けて作ります。
+
+例えば、
+
+LambdaBedrockInvokePolicy
+
+という名前にします。
+
+JSONはこれです。
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BedrockInvoke",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:InvokeModelWithResponseStream"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+
+これを
+
+LambdaBedrockExecutionRole
+
+にアタッチします。
+
+意味は、
+
+このロールを使っているプログラムは、Bedrockのモデルを呼んでいいですよ
+
+です。
+
+⸻
+
+4. JSONその3は作らなくてOK：CloudWatch Logs
+
+LambdaはログをCloudWatchに出すので、その権限も必要です。
+
+これは自分でJSONを書かず、AWSが用意している
+
+AWSLambdaBasicExecutionRole
+
+というAWS管理ポリシーをそのまま、
+
+LambdaBedrockExecutionRole
+
+にアタッチすればOKです。
+
+なので最終的にはこうなります。
+
+LambdaBedrockExecutionRole
+│
+│
+├─ 信頼ポリシー
+│
+│   lambda.amazonaws.com
+│   が AssumeRole していい
+│
+│
+├─ AWS管理ポリシー
+│
+│   AWSLambdaBasicExecutionRole
+│        ↓
+│   CloudWatch Logsを使える
+│
+│
+└─ 自作ポリシー
+     
+    LambdaBedrockInvokePolicy
+         ↓
+    Bedrockを使える
+
+ここが一番重要です。
+
+ロールは1個です。ポリシーが複数くっついています。
+
+今回なら、
+
+ロール
+LambdaBedrockExecutionRole
+      ＋
+ポリシー①
+AWSLambdaBasicExecutionRole
+      ＋
+ポリシー②
+LambdaBedrockInvokePolicy
+
+という構造です。
+
+信頼ポリシーだけはちょっと特殊で、
+
+LambdaBedrockExecutionRole
+  └ 信頼関係
+       └ Trust Policy
+
+としてロールそのものに設定されています。
+
+なのでAWSコンソール上で作業するときは、最終的に次の状態になっていればOKです。
+
+種類	名前	用途
+IAMロール	LambdaBedrockExecutionRole	Lambdaが実行時に使用
+信頼ポリシー	名前なし	Lambdaがこのロールを使用可能にする
+AWS管理ポリシー	AWSLambdaBasicExecutionRole	CloudWatch Logs
+自作ポリシー	LambdaBedrockInvokePolicy	Bedrock呼び出し
+
+そしてLambdaを作成するときに、
+
+実行ロール
+↓
+既存のロールを使用
+↓
+LambdaBedrockExecutionRole
+
+を指定します。
+
+そうするとLambdaのC#などからBedrock SDKを呼んだ際、
+
+あなた
+ ↓
+Lambdaを実行
+Lambda
+ ↓
+LambdaBedrockExecutionRole を取得
+LambdaBedrockExecutionRole
+ ↓
+LambdaBedrockInvokePolicyを見る
+bedrock:InvokeModel OK
+ ↓
+Bedrock呼び出し成功
+
+という流れになります。
+
+ちなみに、前に出てきた①の「あなた自身がスイッチするロール」と今回の②を並べると、全体像はこうです。
+
+あなた
+  │
+  │ Switch Role
+  ▼
+① 開発・構築用ロール
+  │
+  │ Lambdaを作る
+  │
+  │ LambdaBedrockExecutionRoleを
+  │ Lambdaに割り当てる
+  ▼
+Lambda
+  │
+  │ 実行時
+  ▼
+② LambdaBedrockExecutionRole
+  │
+  ├─ AWSLambdaBasicExecutionRole
+  │     → ログ出力
+  │
+  └─ LambdaBedrockInvokePolicy
+        → Bedrock呼び出し
+              │
+              ▼
+           Bedrock
+
+この 「①は人間用、②はLambda用」 が分かれば、IAMはだいぶ見通しよくなります。
