@@ -1,0 +1,87 @@
+flowchart TB
+
+    subgraph A["A. HTTP API + Lambda"]
+        A1[".NET Desktop App"]
+        A2["API Gateway HTTP API"]
+        A3["AWS Lambda"]
+        A4["FastAPI + Mangum"]
+        A5["Amazon Bedrock"]
+
+        A1 --> A2
+        A2 --> A3
+        A3 --> A4
+        A4 --> A5
+    end
+
+
+    subgraph B["B. REST API + Lambda"]
+        B1[".NET Desktop App"]
+        B2["API Gateway REST API Regional"]
+        B3["AWS Lambda On-demand"]
+        B4["FastAPI + Mangum"]
+        B5["Amazon Bedrock"]
+
+        B1 --> B2
+        B2 --> B3
+        B3 --> B4
+        B4 --> B5
+    end
+
+
+    subgraph C["C. REST API + Streaming"]
+        C1[".NET Desktop App"]
+        C2["API Gateway REST API"]
+        C3["AWS Lambda"]
+        C4["Python API Application"]
+        C5["Amazon Bedrock Streaming"]
+
+        C1 --> C2
+        C2 --> C3
+        C3 --> C4
+        C4 --> C5
+        C5 -. "Response Stream" .-> C4
+        C4 -. "Response Stream" .-> C3
+        C3 -. "Response Stream" .-> C2
+        C2 -. "Response Stream" .-> C1
+    end
+
+
+    subgraph D["D. Asynchronous Job"]
+        D1[".NET Desktop App"]
+        D2["API Gateway"]
+        D3["API Lambda"]
+        D4["Amazon SQS"]
+        D5["Worker Lambda"]
+        D6["Amazon Bedrock"]
+        D7["DynamoDB"]
+
+        D1 -->|"POST /bedrock"| D2
+        D2 --> D3
+        D3 -->|"Register Job"| D4
+        D3 -->|"202 + jobId"| D1
+
+        D4 --> D5
+        D5 --> D6
+        D6 --> D5
+        D5 -->|"Save Result"| D7
+
+        D1 -->|"GET /jobs/{jobId}"| D2
+        D2 --> D3
+        D3 --> D7
+        D7 --> D3
+        D3 --> D1
+    end
+
+
+    subgraph E["E. ECS / Fargate + FastAPI"]
+        E1[".NET Desktop App"]
+        E2["ALB or API Gateway"]
+        E3["Amazon ECS / AWS Fargate"]
+        E4["FastAPI + Uvicorn"]
+        E5["Amazon Bedrock"]
+
+        E1 --> E2
+        E2 --> E3
+        E3 --> E4
+        E4 --> E5
+    end
