@@ -1,0 +1,21 @@
+flowchart LR
+    Client[".NET Framework 4.8 Desktop App"]
+    APIGW["API Gateway HTTP API"]
+    Lambda["AWS Lambda"]
+    FastAPI["FastAPI + Mangum"]
+    Token["GET /token"]
+    BedrockAPI["POST /bedrock"]
+    Bedrock["Amazon Bedrock"]
+    Logs["CloudWatch Logs"]
+
+    Client -->|HTTPS| APIGW
+    APIGW --> Lambda
+    Lambda --> FastAPI
+
+    FastAPI --> Token
+    FastAPI --> BedrockAPI
+
+    BedrockAPI --> Bedrock
+    Bedrock --> BedrockAPI
+
+    Lambda --> Logs
