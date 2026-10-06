@@ -1,0 +1,876 @@
+API Specification
+
+1. Overview
+
+本APIは、WPFデスクトップアプリケーションからAWS上のAPI Gateway / Lambdaを経由してAmazon Bedrockを利用するためのAPIです。
+
+主な処理フローは以下です。
+
+WPF
+ ↓
+POST /auth
+ ↓
+保守キー認証
+ ↓
+JWT取得
+WPF
+ ↓
+POST /jobs
+ ↓
+Job登録
+ ↓
+jobId取得
+ ↓
+AWS内部でBedrock処理
+WPF
+ ↓
+GET /jobs/{jobId}
+ ↓
+処理状態確認
+ ↓
+生成結果取得
+
+Bedrockの生成には最大数分かかる可能性があるため、POST /jobs では生成完了を待たず、Job受付後すぐにレスポンスを返します。
+
+⸻
+
+2. Common Specification
+
+Base URL
+
+例：
+
+https://api.example.com/v1
+
+各APIは以下の形式でアクセスします。
+
+POST https://api.example.com/v1/auth
+POST https://api.example.com/v1/jobs
+GET  https://api.example.com/v1/jobs/{jobId}
+
+⸻
+
+Content-Type
+
+JSONを使用します。
+
+Content-Type: application/json
+
+⸻
+
+Authentication
+
+POST /auth 以外のAPIではJWTによるBearer認証を使用します。
+
+Authorization: Bearer <accessToken>
+
+JWTが存在しない、期限切れ、不正な場合は 401 Unauthorized を返します。
+
+⸻
+
+3. POST /auth
+
+Purpose
+
+保守キーを使用してクライアントを認証し、以降のAPIアクセスに使用するJWTを取得します。
+
+⸻
+
+Endpoint
+
+POST /auth
+
+⸻
+
+Authentication
+
+不要。
+
+⸻
+
+Request Headers
+
+Content-Type: application/json
+
+⸻
+
+Request Body
+
+{
+  "maintenanceKey": "ABCDEF1234567890"
+}
+
+Parameters
+
+Parameter	Type	Required	Description
+maintenanceKey	string	Yes	ユーザーが保有する保守キー
+
+⸻
+
+Request Example
+
+POST /auth HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+{
+  "maintenanceKey": "ABCDEF1234567890"
+}
+
+⸻
+
+Success Response
+
+HTTP Status
+
+200 OK
+
+Response Body
+
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+  "tokenType": "Bearer",
+  "expiresIn": 3600
+}
+
+Parameters
+
+Parameter	Type	Description
+accessToken	string	JWTアクセストークン
+tokenType	string	Bearer 固定
+expiresIn	integer	JWTの有効時間（秒）
+
+⸻
+
+JWT Payload Example
+
+{
+  "sub": "maintenance-12345",
+  "customerId": "customer-001",
+  "iat": 1791324000,
+  "exp": 1791327600
+}
+
+JWTには最低限以下を持たせます。
+
+Claim	Description
+sub	保守IDなど認証主体を識別するID
+customerId	顧客ID
+iat	JWT発行日時
+exp	JWT有効期限
+
+顧客名など、認証・認可に不要な情報は原則JWTへ含めません。
+
+⸻
+
+Error Responses
+
+400 Bad Request
+
+リクエスト形式が不正な場合。
+
+{
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "maintenanceKey is required."
+  }
+}
+
+例：
+
+* maintenanceKey が存在しない
+* 空文字
+* JSON形式が不正
+
+⸻
+
+401 Unauthorized
+
+保守キーが登録されていない場合。
+
+{
+  "error": {
+    "code": "INVALID_MAINTENANCE_KEY",
+    "message": "Authentication failed."
+  }
+}
+
+セキュリティ上、
+
+存在しない保守キー
+
+と
+
+顧客情報との照合失敗
+
+をクライアント側へ詳細に区別して返さない方が安全です。
+
+⸻
+
+403 Forbidden
+
+保守契約などが無効になっている場合。
+
+{
+  "error": {
+    "code": "MAINTENANCE_DISABLED",
+    "message": "This maintenance contract is currently disabled."
+  }
+}
+
+⸻
+
+500 Internal Server Error
+
+AWS内部などで予期しないエラーが発生した場合。
+
+{
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "An unexpected error occurred."
+  }
+}
+
+⸻
+
+4. POST /jobs
+
+Purpose
+
+Bedrock生成処理をJobとして登録します。
+
+本APIではBedrock生成完了を待ちません。
+
+Jobを登録し、jobId を発行した時点でレスポンスを返します。
+
+⸻
+
+Endpoint
+
+POST /jobs
+
+⸻
+
+Authentication
+
+必要。
+
+Authorization: Bearer <accessToken>
+
+⸻
+
+Request Headers
+
+Authorization: Bearer <accessToken>
+Content-Type: application/json
+
+⸻
+
+Request Body
+
+{
+  "input": "この文章について分析してください。"
+}
+
+Parameters
+
+Parameter	Type	Required	Description
+input	string	Yes	Bedrockへ渡す入力文字列
+
+⸻
+
+Request Example
+
+POST /jobs HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+Content-Type: application/json
+{
+  "input": "この文章について分析してください。"
+}
+
+⸻
+
+Success Response
+
+HTTP Status
+
+202 Accepted
+
+200 OK ではなく 202 Accepted とすることで、
+
+リクエストは受け付けたが処理はまだ完了していない
+
+ことを表します。
+
+Response Body
+
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "QUEUED",
+  "createdAt": "2026-10-07T07:45:00+09:00"
+}
+
+Parameters
+
+Parameter	Type	Description
+jobId	string	Jobを一意に識別するID
+status	string	Jobの現在状態
+createdAt	string	Job作成日時（ISO 8601）
+
+⸻
+
+Job Status
+
+以下のステータスを定義します。
+
+Status	Description
+QUEUED	Job受付済み。まだ処理開始前
+PROCESSING	Bedrock生成処理中
+SUCCEEDED	正常終了
+FAILED	処理失敗
+
+将来的に必要であれば以下も追加可能です。
+
+CANCELLED
+TIMEOUT
+
+⸻
+
+Internal Processing
+
+POST /jobs 受付後、AWS内部では以下を実行します。
+
+Job Submit Lambda
+        ↓
+jobId生成
+        ↓
+DynamoDB
+status = QUEUED
+        ↓
+SQS
+        ↓
+Worker Lambda
+        ↓
+status = PROCESSING
+        ↓
+Bedrock
+        ↓
+status = SUCCEEDED / FAILED
+
+⸻
+
+Error Responses
+
+400 Bad Request
+
+入力値が不正な場合。
+
+{
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "input is required."
+  }
+}
+
+⸻
+
+400 Input Too Large
+
+入力文字列が許容サイズを超えている場合。
+
+{
+  "error": {
+    "code": "INPUT_TOO_LARGE",
+    "message": "The input exceeds the maximum allowed size."
+  }
+}
+
+最大文字数についてはBedrockの利用モデルや業務要件に応じて別途定義します。
+
+⸻
+
+401 Unauthorized
+
+JWTがない、または無効な場合。
+
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "A valid access token is required."
+  }
+}
+
+対象例：
+
+Authorizationヘッダーなし
+JWT形式不正
+署名不正
+JWT有効期限切れ
+
+⸻
+
+403 Forbidden
+
+JWT自体は正常だが、現在の顧客にAPI利用権限がない場合。
+
+{
+  "error": {
+    "code": "ACCESS_DENIED",
+    "message": "You are not authorized to use this API."
+  }
+}
+
+⸻
+
+429 Too Many Requests
+
+一定時間内の利用回数を超過した場合。
+
+{
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Too many requests. Please try again later."
+  }
+}
+
+Bedrockコストや意図しない大量リクエスト対策として設定を推奨します。
+
+⸻
+
+500 Internal Server Error
+
+Job登録処理などで内部エラーが発生した場合。
+
+{
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "An unexpected error occurred."
+  }
+}
+
+⸻
+
+503 Service Unavailable
+
+SQSや内部サービスなどが一時的に利用できない場合。
+
+{
+  "error": {
+    "code": "SERVICE_UNAVAILABLE",
+    "message": "The service is temporarily unavailable."
+  }
+}
+
+⸻
+
+5. GET /jobs/{jobId}
+
+Purpose
+
+指定されたJobの処理状態、およびBedrock生成結果を取得します。
+
+⸻
+
+Endpoint
+
+GET /jobs/{jobId}
+
+⸻
+
+Authentication
+
+必要。
+
+Authorization: Bearer <accessToken>
+
+⸻
+
+Path Parameters
+
+Parameter	Type	Required	Description
+jobId	string	Yes	POST /jobs で取得したJob ID
+
+⸻
+
+Request Example
+
+GET /jobs/01J9ABCDEF1234567890 HTTP/1.1
+Host: api.example.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+
+⸻
+
+5.1 QUEUED
+
+まだWorker Lambdaによる処理が開始されていない場合。
+
+HTTP Status
+
+200 OK
+
+Response Body
+
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "QUEUED",
+  "createdAt": "2026-10-07T07:45:00+09:00",
+  "startedAt": null,
+  "completedAt": null,
+  "result": null
+}
+
+⸻
+
+5.2 PROCESSING
+
+Bedrock生成中の場合。
+
+HTTP Status
+
+200 OK
+
+Response Body
+
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "PROCESSING",
+  "createdAt": "2026-10-07T07:45:00+09:00",
+  "startedAt": "2026-10-07T07:45:02+09:00",
+  "completedAt": null,
+  "result": null
+}
+
+⸻
+
+5.3 SUCCEEDED
+
+Bedrock生成が正常に完了した場合。
+
+HTTP Status
+
+200 OK
+
+Response Body
+
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "SUCCEEDED",
+  "createdAt": "2026-10-07T07:45:00+09:00",
+  "startedAt": "2026-10-07T07:45:02+09:00",
+  "completedAt": "2026-10-07T07:47:34+09:00",
+  "result": "Bedrockによって生成された結果です。"
+}
+
+⸻
+
+5.4 FAILED
+
+Bedrock生成、Lambda処理などに失敗した場合。
+
+HTTP Status
+
+200 OK
+
+Response Body
+
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "FAILED",
+  "createdAt": "2026-10-07T07:45:00+09:00",
+  "startedAt": "2026-10-07T07:45:02+09:00",
+  "completedAt": "2026-10-07T07:46:15+09:00",
+  "result": null,
+  "error": {
+    "code": "GENERATION_FAILED",
+    "message": "Failed to generate the requested result."
+  }
+}
+
+Job自体が正常に取得できているため、Bedrock処理失敗時でもHTTPステータスは 200 OK とします。
+
+つまり、
+
+HTTPステータス
+=
+API通信・API処理が正常だったか
+Job status
+=
+非同期Jobが成功したか
+
+を分離して扱います。
+
+⸻
+
+6. GET /jobs/{jobId} Error Responses
+
+400 Bad Request
+
+jobIdの形式が不正な場合。
+
+{
+  "error": {
+    "code": "INVALID_JOB_ID",
+    "message": "The specified jobId is invalid."
+  }
+}
+
+⸻
+
+401 Unauthorized
+
+JWTが存在しない、期限切れ、不正な場合。
+
+{
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "A valid access token is required."
+  }
+}
+
+⸻
+
+403 Forbidden
+
+Jobは存在するが、そのJobを作成した顧客とJWTの customerId が一致しない場合。
+
+例：
+
+JWT
+customerId = customer-A
+Job
+customerId = customer-B
+
+この場合は結果を返しません。
+
+403 Forbidden
+{
+  "error": {
+    "code": "ACCESS_DENIED",
+    "message": "You are not authorized to access this job."
+  }
+}
+
+⸻
+
+404 Not Found
+
+指定されたJobが存在しない場合。
+
+{
+  "error": {
+    "code": "JOB_NOT_FOUND",
+    "message": "The specified job was not found."
+  }
+}
+
+⸻
+
+500 Internal Server Error
+
+DynamoDBアクセス失敗などの内部エラー。
+
+{
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "An unexpected error occurred."
+  }
+}
+
+⸻
+
+7. Common Error Format
+
+全APIのエラー形式は原則統一します。
+
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Error message."
+  }
+}
+
+必要に応じてトラブルシューティング用のRequest IDを追加します。
+
+{
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "An unexpected error occurred.",
+    "requestId": "6ef0fd96-fc74-4b55-bb07-47abdf61xxxx"
+  }
+}
+
+requestId はCloudWatch Logs上のログと紐付けておくと、障害調査が容易になります。
+
+⸻
+
+8. Error Code List
+
+HTTP Status	Error Code	API	Description
+400	INVALID_REQUEST	/auth, /jobs	リクエスト形式不正
+400	INVALID_JOB_ID	/jobs/{jobId}	Job ID形式不正
+400	INPUT_TOO_LARGE	/jobs	入力サイズ超過
+401	INVALID_MAINTENANCE_KEY	/auth	保守キー認証失敗
+401	UNAUTHORIZED	/jobs, /jobs/{jobId}	JWT不正・期限切れ
+403	MAINTENANCE_DISABLED	/auth	保守契約無効
+403	ACCESS_DENIED	/jobs, /jobs/{jobId}	アクセス権限なし
+404	JOB_NOT_FOUND	/jobs/{jobId}	Jobが存在しない
+429	RATE_LIMIT_EXCEEDED	/jobs	API利用回数超過
+500	INTERNAL_ERROR	All	AWS内部エラー
+503	SERVICE_UNAVAILABLE	/jobs	一時的なサービス利用不可
+
+⸻
+
+9. Job Error Codes
+
+Job処理そのものに失敗した場合はHTTPエラーではなく、status = FAILED として返します。
+
+例：
+
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "FAILED",
+  "result": null,
+  "error": {
+    "code": "BEDROCK_TIMEOUT",
+    "message": "The generation process timed out."
+  }
+}
+
+想定するJobエラーコード：
+
+Error Code	Description
+GENERATION_FAILED	Bedrock生成処理失敗
+BEDROCK_TIMEOUT	Bedrock処理タイムアウト
+BEDROCK_THROTTLED	Bedrock側のスロットリング
+INVALID_BEDROCK_RESPONSE	Bedrockレスポンス解析失敗
+INTERNAL_JOB_ERROR	Worker Lambda内部エラー
+
+⸻
+
+10. WPF Client Flow
+
+WPFアプリケーションでは以下の順序で処理します。
+
+アプリ起動・処理開始
+        ↓
+POST /auth
+        ↓
+JWT取得
+        ↓
+POST /jobs
+        ↓
+202 Accepted
+        ↓
+jobId取得
+        ↓
+数秒待機
+        ↓
+GET /jobs/{jobId}
+        ↓
+┌─────────────────────┐
+│ QUEUED              │
+│ PROCESSING          │
+└──────────┬──────────┘
+           │
+           │ 数秒後再取得
+           ↓
+GET /jobs/{jobId}
+           ↓
+┌──────────┴──────────┐
+│                     │
+▼                     ▼
+SUCCEEDED            FAILED
+│                     │
+▼                     ▼
+結果表示              エラー表示
+
+ポーリング間隔は例えば以下とします。
+
+2～5秒
+
+一定時間以上処理が完了しない場合、WPF側では画面上にタイムアウト表示をしてもよいですが、AWS側のJob自体は継続させることができます。
+
+⸻
+
+11. API Summary
+
+Method	Endpoint	Authentication	Purpose
+POST	/auth	不要	保守キー認証・JWT取得
+POST	/jobs	JWT	Bedrock生成Job登録
+GET	/jobs/{jobId}	JWT	Job状態・生成結果取得
+
+⸻
+
+12. Example Complete Flow
+
+1. Authentication
+
+POST /auth
+Content-Type: application/json
+{
+  "maintenanceKey": "ABCDEF1234567890"
+}
+
+Response:
+
+{
+  "accessToken": "eyJhbGciOi...",
+  "tokenType": "Bearer",
+  "expiresIn": 3600
+}
+
+⸻
+
+2. Submit Job
+
+POST /jobs
+Authorization: Bearer eyJhbGciOi...
+Content-Type: application/json
+{
+  "input": "このデータを分析してください。"
+}
+
+Response:
+
+202 Accepted
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "QUEUED",
+  "createdAt": "2026-10-07T07:45:00+09:00"
+}
+
+⸻
+
+3. Check Job
+
+GET /jobs/01J9ABCDEF1234567890
+Authorization: Bearer eyJhbGciOi...
+
+Response:
+
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "PROCESSING",
+  "createdAt": "2026-10-07T07:45:00+09:00",
+  "startedAt": "2026-10-07T07:45:02+09:00",
+  "completedAt": null,
+  "result": null
+}
+
+⸻
+
+4. Get Result
+
+GET /jobs/01J9ABCDEF1234567890
+Authorization: Bearer eyJhbGciOi...
+
+Response:
+
+{
+  "jobId": "01J9ABCDEF1234567890",
+  "status": "SUCCEEDED",
+  "createdAt": "2026-10-07T07:45:00+09:00",
+  "startedAt": "2026-10-07T07:45:02+09:00",
+  "completedAt": "2026-10-07T07:47:34+09:00",
+  "result": "Bedrockによる生成結果です。"
+}
