@@ -1,0 +1,468 @@
+その要件なら、②は非同期ジョブ方式にするのがかなり相性いいです。Bedrockのテキスト生成を3分待たせる設計より、API Gatewayはすぐ 202 Accepted を返して、AWS内部で処理を続ける形をおすすめします。API GatewayのHTTP APIは統合タイムアウトが最大30秒なので、3分処理を同期レスポンスにする構成とはそもそも噛み合いません。
+
+まず全体像は、こうするのがシンプルです。
+
+┌─────────────────────┐
+│ WPF Desktop App     │
+└──────────┬──────────┘
+           │
+           │ ① POST /auth
+           │    maintenanceKey
+           ▼
+┌─────────────────────┐
+│ API Gateway         │
+└──────────┬──────────┘
+           ▼
+┌─────────────────────┐
+│ Auth Lambda         │
+│                     │
+│ ・保守ID照合         │
+│ ・顧客照合           │
+│ ・JWT発行            │
+└──────────┬──────────┘
+           │
+           ▼
+      DynamoDB
+   顧客・保守キー管理
+           │
+           │ JWT
+           ▼
+┌─────────────────────┐
+│ WPF Desktop App     │
+└──────────┬──────────┘
+           │
+           │ ② POST /jobs
+           │ Authorization:
+           │ Bearer <JWT>
+           │
+           │ input文字列
+           ▼
+┌─────────────────────┐
+│ API Gateway         │
+├─────────────────────┤
+│ Lambda Authorizer   │ ← JWT検証
+└──────────┬──────────┘
+           ▼
+┌─────────────────────┐
+│ Job受付 Lambda      │
+│                     │
+│ jobId発行           │
+│ status = QUEUED     │
+└──────┬────────┬─────┘
+       │        │
+       │        └───────────────┐
+       ▼                        ▼
+  DynamoDB                    SQS
+ Job管理DB                      │
+                               ▼
+                     ┌──────────────────┐
+                     │ Worker Lambda    │
+                     │                  │
+                     │ status=PROCESSING│
+                     │       ↓          │
+                     │    Bedrock       │
+                     │       ↓          │
+                     │ 結果保存          │
+                     └────────┬─────────┘
+                              ▼
+                           DynamoDB
+                       status=SUCCEEDED
+                       result=生成結果
+WPF
+ │
+ │ ③ GET /jobs/{jobId}
+ ▼
+API Gateway
+ │
+ ▼
+結果取得Lambda
+ │
+ ▼
+DynamoDB
+QUEUED
+PROCESSING
+SUCCEEDED
+FAILED
+
+① 認証
+
+ここは考えている JWTでOK です。
+
+ただ、APIとしては
+
+GET /auth?maintenanceKey=xxxxx
+
+より、
+
+POST /auth
+Content-Type: application/json
+{
+  "maintenanceKey": "xxxxx"
+}
+
+を推します。保守キーは実質的な認証情報なので、URLに含めない方がいいです。
+
+Auth Lambdaでは、
+
+maintenanceKey
+    ↓
+DB検索
+    ↓
+maintenanceId
+customerId
+customerName
+enabled
+
+を確認。
+
+正常なら例えば、
+
+{
+  "accessToken": "eyJhbGciOi...",
+  "expiresIn": 3600
+}
+
+を返します。
+
+JWTの中身は例えば、
+
+{
+  "sub": "maintenance-12345",
+  "customerId": "customer-001",
+  "iat": 1791324000,
+  "exp": 1791327600
+}
+
+くらいで十分です。
+
+顧客名はJWTに入れなくてもいいと思います。JWTは暗号化データではなく、クライアントから普通に中身を読めるためです。
+
+JWTは②以降、
+
+Authorization: Bearer eyJhbGciOi...
+
+として送る。
+
+API GatewayはLambda Authorizerを使えば、AuthorizationヘッダーのトークンをLambdaに渡して検証できます。AWSもBearer token/JWTをLambda Authorizerで扱える構成をサポートしています。
+
+⸻
+
+② Bedrockリクエスト
+
+ここが今回一番重要です。
+
+例えばWPFから、
+
+POST /jobs
+Authorization: Bearer xxxx
+Content-Type: application/json
+{
+  "input": "この文章を分析してください..."
+}
+
+を送る。
+
+受付LambdaではBedrockを呼びません。
+
+やるのは、
+
+1. jobId生成
+2. DynamoDBにJob登録
+3. SQSにメッセージ送信
+4. 即レスポンス
+
+だけ。
+
+例えば、
+
+{
+  "jobId": "01J9ABCDEF123456",
+  "status": "QUEUED"
+}
+
+HTTPとしては、
+
+202 Accepted
+
+が自然です。
+
+これなら数百ms程度でWPF側へ戻せます。
+
+⸻
+
+DynamoDBはこんな感じ
+
+例えば BedrockJobs。
+
+PK
+jobId
+customerId
+maintenanceId
+status
+input
+result
+createdAt
+startedAt
+completedAt
+errorMessage
+expiresAt
+
+具体例：
+
+{
+  "jobId": "job-8f35d7",
+  "customerId": "customer-001",
+  "maintenanceId": "maintenance-12345",
+  "status": "PROCESSING",
+  "input": "xxx",
+  "result": null,
+  "createdAt": "2026-10-07T07:30:00+09:00",
+  "startedAt": "2026-10-07T07:30:02+09:00",
+  "completedAt": null
+}
+
+ステータスはひとまず、
+
+QUEUED
+PROCESSING
+SUCCEEDED
+FAILED
+
+くらいで十分です。
+
+あとで必要なら、
+
+CANCELLED
+TIMEOUT
+
+を追加できます。
+
+⸻
+
+SQS → Worker Lambda → Bedrock
+
+SQSに入れるのは例えば、
+
+{
+  "jobId": "job-8f35d7",
+  "customerId": "customer-001"
+}
+
+だけでもいいです。
+
+Worker Lambdaが起動したら、
+
+DynamoDB取得
+↓
+status
+QUEUED → PROCESSING
+↓
+Bedrock InvokeModel / Converse
+↓
+成功
+status = SUCCEEDED
+result = xxx
+失敗
+status = FAILED
+errorMessage = xxx
+
+とします。
+
+Bedrockが最大3分程度なら、普通のLambda Workerで十分現実的です。Lambdaの通常実行タイムアウトは最大15分です。
+
+例えばWorker Lambdaを、
+
+Timeout = 5分
+
+くらいにしておけばいいです。
+
+ちなみにBedrockには StartAsyncInvoke もありますが、現行AWSドキュメントでは主に動画生成などの非同期推論用途として案内されていて、今回のような一般的なテキスト生成なら、SQS + Lambda + Converse/InvokeModel の方が素直です。
+
+⸻
+
+③ WPFから結果確認
+
+②のレスポンスで、
+
+{
+  "jobId": "job-8f35d7"
+}
+
+を受け取ったら、例えば2～5秒ごとに、
+
+GET /jobs/job-8f35d7
+Authorization: Bearer xxxx
+
+を呼ぶ。
+
+処理中なら、
+
+{
+  "jobId": "job-8f35d7",
+  "status": "PROCESSING"
+}
+
+完成したら、
+
+{
+  "jobId": "job-8f35d7",
+  "status": "SUCCEEDED",
+  "result": "Bedrockで生成された結果..."
+}
+
+という感じです。
+
+WPF側は、
+
+POST /jobs
+↓
+jobId取得
+↓
+2秒待つ
+↓
+GET /jobs/{jobId}
+PROCESSING
+↓
+2秒待つ
+PROCESSING
+↓
+2秒待つ
+SUCCEEDED
+↓
+画面表示
+
+でいいと思います。
+
+WebSocket等でAWS側からWPFへ完了通知する方法もありますが、今回ならまずポーリングで十分です。構成が一気に簡単になります。
+
+⸻
+
+セキュリティ上、かなり大事なところ
+
+結果取得時には、
+
+JWT.customerId
+
+と
+
+Job.customerId
+
+を必ず比較してください。
+
+つまり、
+
+JWT
+customerId = A
+GET /jobs/xxx
+↓
+job xxx
+customerId = B
+
+なら、
+
+403 Forbidden
+
+です。
+
+単純に、
+
+jobIdを知っていれば結果が取れる
+
+構造にはしない方がいいです。
+
+⸻
+
+DynamoDBに結果を持つか
+
+ここは生成結果の大きさ次第です。
+
+DynamoDBは1アイテム最大400KBなので、数KB～数十KB程度のテキストなら、
+
+input
+result
+
+までDynamoDBに入れてしまっていいと思います。
+
+もし将来的に、
+
+長大な文章
+CSV
+JSON
+PDF
+大量の生成結果
+
+などになるなら、
+
+DynamoDB
+  status
+  resultS3Key
+S3
+  実際の結果
+
+に変える。
+
+今回の「文字列input → 文字列output」なら、まずDynamoDBで十分そうです。
+
+⸻
+
+SQSについて1個だけ注意
+
+Bedrockが3分程度かかるなら、SQSのVisibility Timeoutはかなり長く取ります。
+
+AWSはLambda + SQSの場合、Visibility TimeoutをLambda Timeoutの少なくとも6倍にすることを推奨しています。
+
+例えば、
+
+Worker Lambda Timeout
+5分
+SQS Visibility Timeout
+30分
+
+という設定。
+
+さらに、
+
+SQS
+ ↓ 5回失敗
+DLQ
+
+も付けておくのがおすすめです。AWSも失敗メッセージ用にDLQを推奨しています。
+
+⸻
+
+なので、現時点で僕なら構成をこう固定します。
+
+API Gateway
+├─ POST /auth
+│    ↓
+│  Auth Lambda
+│    ↓
+│  Customer DynamoDB
+│    ↓
+│  JWT返却
+│
+├─ POST /jobs
+│    ↓
+│  Lambda Authorizer（JWT）
+│    ↓
+│  Job Submit Lambda
+│    ├→ Job DynamoDB
+│    └→ SQS
+│          ↓
+│       Worker Lambda
+│          ↓
+│       Bedrock
+│          ↓
+│       Job DynamoDB
+│
+└─ GET /jobs/{jobId}
+     ↓
+   Lambda Authorizer（JWT）
+     ↓
+   Job Get Lambda
+     ↓
+   Job DynamoDB
+
+この構成、今の要件ならかなりちょうどいい規模感です。Step Functionsまで入れなくてもいいと思います。
+
+次に詰めたいのは、実は 「①のJWTを誰がどう署名して、②でどう検証するか」 と 「DynamoDBを顧客マスタ・Job管理でどう切るか」 の2点です。ここを決めると、Lambdaごとの役割・IAMロール・APIのRequest/Response JSONまでかなり具体化できます。
