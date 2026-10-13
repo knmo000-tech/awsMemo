@@ -1,6 +1,6 @@
 # Bedrock 非同期API 構成設計（FastAPI採用版）
 
-> ステータス: 設計ドラフト / 2026-10-13。FastAPI採用とLambda 2関数構成は確定方針。API Gatewayの種類、WAF接続方式、KMSの管理キー範囲は提案段階。
+> ステータス: 設計ドラフト / 2026-10-13。FastAPI採用とLambda 2関数構成は確定方針。API Gatewayの種類とWAF接続方式は検討中。**専用のKMSカスタマー管理キーは不採用（標準暗号化は継続）**。設計判断の理由と経緯は [ADR](adr/README.md) に記録する。
 
 ## 構成概要
 
@@ -17,14 +17,13 @@ flowchart TD
       A -->|"非同期Invoke"| W["Worker Lambda<br/>Python / Bedrock処理"]
       A <--> D[("DynamoDB<br/>Customers / Jobs")]
       W --> D
+      W --> U[("DynamoDB<br/>UsageEvents（案）")]
       W --> B["Amazon Bedrock"]
       W --> S[("S3<br/>生成CSV")]
       A -->|"署名付きURL発行"| S
       SM["Secrets Manager"] -.->|"秘密鍵取得"| A
       CT["CloudTrail<br/>AWS操作監査"] -.-> AUDIT[("監査ログ保存先S3")]
       GD["GuardDuty<br/>脅威検出"] --> EV["EventBridge → SNS等<br/>通知"]
-      KMS["KMS<br/>顧客管理キーは条件付き"] -.-> S
-      KMS -.-> D
       LOG["CloudWatch<br/>APIアクセス・Lambdaログ/アラーム"]
       GW -.-> LOG
       A -.-> LOG
@@ -33,7 +32,7 @@ flowchart TD
     C -->|"短命署名付きURLでCSV取得"| S
 ```
 
-**注:** CloudTrail / GuardDuty / KMS の破線等は監査・保護の論理関係であり、リクエストの通信経路ではない。GuardDutyは検知サービスで、自動ブロックには別の対処設定が必要。S3のURLは認可確認後だけ発行する。
+**注:** CloudTrail / GuardDuty の破線等は監査・保護の論理関係であり、リクエストの通信経路ではない。GuardDutyは検知サービスで、自動ブロックには別の対処設定が必要。S3のURLは認可確認後だけ発行する。
 
 ## API Gatewayの選択（要決定）
 
@@ -103,10 +102,11 @@ handler = Mangum(app)
 | ApiLambdaExecutionRole | `secretsmanager:GetSecretValue` | 署名秘密鍵の取得（採用時のみ） |
 | WorkerLambdaExecutionRole | `bedrock:InvokeModel` | 許可したモデル/推論プロファイルだけ |
 | WorkerLambdaExecutionRole | `dynamodb:UpdateItem` | Jobsの状態更新 |
+| WorkerLambdaExecutionRole（請求設計案） | `dynamodb:PutItem` | UsageEventsへの条件付き新規追記（既存レコードは上書きさせない） |
 | WorkerLambdaExecutionRole | `s3:PutObject` | 結果CSV書き込み |
 | 両実行ロール | CloudWatch Logs書き込み | 実行ログ |
 
-KMSの顧客管理キーを使う場合は別途Key policy/IAMを検討。**S3 SSE-KMS**なら、通常、Workerの書き込みで `kms:GenerateDataKey`、署名付きURLを作るAPI Lambdaの読み取りで `kms:Decrypt` が必要。DynamoDBのCMKはサービス経由のKMSアクセス設計を検証する。API Lambdaに `bedrock:InvokeModel` は付けない。
+**専用KMSカスタマー管理キーは不採用。** DynamoDBの既定暗号化とS3 SSE-S3を継続する。課金実績の改ざん防止はIAM制限・条件付き追記・監査と復旧で対処する（[ADR-0004](adr/0004-no-customer-kms.md)）。API Lambdaに `bedrock:InvokeModel` は付けない。
 
 デプロイ担当者のスイッチロール・管理ロールと、Lambdaが実行時にAssumeRoleする実行ロールは別。
 
@@ -114,6 +114,8 @@ KMSの顧客管理キーを使う場合は別途Key policy/IAMを検討。**S3 S
 
 - Customers: 顧客ID/名前/保守キーの検証材料/有効フラグ。保守キーの平文保管は禁止。
 - Jobs: jobId, customerId, status, createdAt, updatedAt, resultS3Key, errorCode, expiresAt。
+- **請求の最重要データ**: Bedrock実トークン使用量（顧客・ジョブ・モデル・入出力別）をサーバー側で保持し、独自料金を計算する。追記型の UsageEvents テーブルを提案。物理設計は未確定 ([ADR-0003](adr/0003-storage-billing.md))。
+- 請求の完全性: 二重実行/二重請求防止、変更権限の制限、監査、DynamoDB PITR、請求明細の証拠保全を検討。
 - `QUEUED → RUNNING → SUCCEEDED`、異常時 `FAILED`。
 - API LambdaはトークンからcustomerIdを決定し、全ジョブ照会で所有者を確認。
 - 非同期Invokeは重複・再試行・失敗し得る。条件付き更新による冪等性、滞留監視、失敗通知を追加。本番の耐障害性要求によってSQS導入を検討。
@@ -128,7 +130,7 @@ KMSの顧客管理キーを使う場合は別途Key policy/IAMを検討。**S3 S
 - **アプリ監査ログ**: 顧客ID、jobId、actor（認証主体）、処理種別、結果、時刻、相関ID。保守キー・入力全文・トークンは記録しない。
 - **WAF**: マネージドルール、`/auth` レートベースルール。Countで検証後にBlock。ログの秘匿化と保管期間を定義。
 - **GuardDuty**: 基本保護を有効化し、必要に応じLambda ProtectionとS3 Protectionを追加。EventBridge→SNS等で通知。
-- **KMS**: S3/DynamoDBはデフォルトで暗号化される。より厳密な鍵制御・監査要件がある場合に顧客管理キーを採用。
+- **KMS**: **専用の顧客管理キーは現時点で不採用**。S3 SSE-S3とDynamoDBの既定の保存時暗号化は継続。重要な請求データの正確性保護にはIAM・条件付き追記・監査・PITRを優先 ([ADR-0004](adr/0004-no-customer-kms.md))。
 - **Secrets Manager**: JWT等の署名用秘密情報を管理。キーの取得回数・キャッシュ・ローテーションを設計。
 
 詳細は [セキュリティ・監査設計](security.md) を参照。
@@ -139,8 +141,8 @@ KMSの顧客管理キーを使う場合は別途Key policy/IAMを検討。**S3 S
 2. 保守キーの形・顧客照合方法・署名済みアクセストークンと失効仕様。
 3. Bedrockのモデル・出力CSVの仕様・課金/クォータ。
 4. ジョブ/成果物保持期間、監査ログ保存期間、求める監査証跡の粒度。
-5. SSE-S3/標準DynamoDB暗号化で十分か、SSE-KMS/顧客管理キーが必要か。
+5. **専用KMS顧客管理キーは採用しないと決定済み**。顧客契約や監査要件が変わった場合のみ再評価 ([ADR-0004](adr/0004-no-customer-kms.md))。
 6. WAFの閾値、正規顧客のアクセス傾向、GuardDutyの通知先。
 7. 非同期実行の再試行・障害送信先・滞留監視。
 
-関連: [API仕様](api-spec.md) / [シーケンス](sequence.md) / [セキュリティ・監査](security.md)
+関連: [API仕様](api-spec.md) / [シーケンス](sequence.md) / [セキュリティ・監査](security.md) / [設計判断記録（ADR）](adr/README.md)
