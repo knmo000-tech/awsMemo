@@ -1,6 +1,6 @@
 # セキュリティ・監査設計（導入検討）
 
-> 設計ドラフト / 2026-10-13。**まだAWSに設定したわけではない**。原則としてAPI Gateway REST API + WAFを推奨する（API Gateway方式は未決定）。**専用KMSカスタマー管理キーは現時点で不採用と決定済み**。金額・保持期間・ルール閾値は実環境で見積もること。
+> 設計ドラフト / 2026-10-13。**まだAWSに設定したわけではない**。原則としてAPI Gateway REST API + WAFを推奨する（REST API＋WAFは採用決定）。**専用KMSカスタマー管理キーは現時点で不採用と決定済み**。金額・保持期間・ルール閾値は実環境で見積もること。
 
 ## 1. 守りたいもの
 
@@ -15,19 +15,19 @@
 
 | サービス/機能 | 担当範囲 | 今回の導入案 | 注意事項 |
 | --- | --- | --- | --- |
-| **AWS WAF** | インターネットからのHTTP攻撃・大量アクセス軽減 | **推奨**。REST APIステージに紐づけ | すべての不正を防止するものではない。HTTP APIは直接紐づけ不可 |
+| **AWS WAF** | インターネットからのHTTP攻撃・大量アクセス軽減 | **採用決定**。REST APIステージに紐づけ | すべての不正を防止するものではない。HTTP APIは直接紐づけ不可 |
 | **CloudTrail** | AWS管理・API操作の監査 | **推奨**。マルチリージョンのTrailで保存 | Event historyは管理イベントの過去90日。データイベントは別途設定が必要 |
 | **GuardDuty** | AWS環境の不審な挙動検出 | **推奨**。検出結果の通知もセットで設計 | 検知サービスでありWAFの代わりではない |
 | **AWS KMS（専用カスタマー管理キー）** | 独自の鍵制御・利用監査 | **不採用（現時点）**。DynamoDB既定の保存時暗号化・S3 SSE-S3を利用 | 請求トークン使用量の改ざん防止はKMSだけでは実現できず、整合性・監査・復旧を優先。顧客要件が変われば再検討 |
 | **CloudWatch** | HTTP/API・Lambdaの運用ログとアラーム | **推奨**。APIアクセスログ + Lambdaアプリ監査ログ | 個人情報・認証情報・生成内容は記録しない |
-| **Secrets Manager** | 秘密情報保管・更新 | **推奨**。トークン署名鍵等に使用 | 平文の環境変数やソースコード埋め込みを避ける |
+| **Secrets Manager** | 秘密情報保管・更新 | **採用決定**。自前JWTの署名鍵を保管 | 平文の環境変数やソースコード埋め込みを避ける |
 | **AWS Budgets / Cost Anomaly Detection** | Bedrock・WAF等の請求異常 | **推奨** | 予算超過通知は自動的な遮断ではない |
 
 ## 3. WAF設計
 
-**案A（推奨）**: WPF → **API Gateway REST API（Regional）+ WAF** → API Lambda（FastAPI+Mangum）。この案なら、REST APIステージにWeb ACLを関連付けられる。
+**案A（採用）**: WPF → **API Gateway REST API（Regional）+ WAF** → API Lambda（FastAPI+Mangum）。この案なら、REST APIステージにWeb ACLを関連付けられる。
 
-**案B（代替）**: WPF → CloudFront + WAF → API Gateway HTTP API → API Lambda。CloudFrontを経由しないAPI Gateway標準URLへの直接アクセス対策が必要。追加の検証なしに案Bを安全と見なさない。
+**案B（不採用の代替案）**: WPF → CloudFront + WAF → API Gateway HTTP API → API Lambda。CloudFrontを経由しないAPI Gateway標準URLへの直接アクセス対策が必要。追加の検証なしに案Bを安全と見なさない。
 
 ルール導入順序案:
 
@@ -41,6 +41,8 @@
 
 AWS公式: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html
 https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-aws-waf.html
+
+**認証・APIキー方針（決定済み）:** API Gateway REST APIの`apiKeyRequired`を`false`にする。WPFには既存保守キーのみを使用し、`POST /auth`のFastAPIでDynamoDB照合後にJWTを発行。`/jobs`ではJWTを検証する。API Gatewayの追加APIキーは配布しない。JWT署名秘密鍵はSecrets Managerで管理する。署名方式・鍵更新時の旧トークン検証・失効は別途設計する。
 
 ## 4. CloudTrail設計（AWS操作の監査）
 
@@ -141,7 +143,7 @@ WAF（Web ACL/ルール/リクエスト/ログ）、CloudTrail（追加Trail・�
 ## 11. 実装前に確認すべきこと
 
 1. 想定API呼び出し数、利用顧客数、ピーク時の認証頻度。
-2. REST API+WAF採用の可否、ネットワーク制限（接続元IP制限やVPN利用の有無）。
+2. **REST API＋WAFは採用確定**。ネットワーク制限（接続元IP制限やVPN利用の有無）。
 3. 監査の保存期間と、S3/CSVへのアクセスを誰の操作として記録するか。
 4. **KMSのカスタマー管理キーは現時点で不採用**。将来の顧客契約・監査要求が変更された場合のみ再評価。
 5. 障害通知の送信先、当番、月額運用予算。
