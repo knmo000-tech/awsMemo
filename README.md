@@ -21,7 +21,8 @@ WPF（.NET Framework 4.8）から AWS の Amazon Bedrock を利用してCSVを�
 | [docs/architecture.md](docs/architecture.md) | 全体構成図、Lambda責務、FastAPI、IAMと設計判断 |
 | [docs/api-spec.md](docs/api-spec.md) | APIエンドポイント、Request/Response、エラー |
 | [docs/sequence.md](docs/sequence.md) | 認証〜非同期Bedrock実行〜CSV取得のフロー |
-| [docs/security.md](docs/security.md) | WAF、CloudTrail、GuardDuty、KMS不採用判断、請求データの保護、監査・通知 | 
+| [docs/security.md](docs/security.md) | WAF、CloudTrail、GuardDuty、KMS不採用判断、請求データの保護、監査・通知 |
+| **[docs/billing-data-design-notes.md](docs/billing-data-design-notes.md)** | **DB設計前の検討メモ：UsageEvents分離、請求実績の権限制限、冪等性、監査・復旧** | 
 | **[docs/adr/README.md](docs/adr/README.md)** | **採用・不採用・検討中の判断一覧、理由、代替案、経緯、見直し条件（ADR）** |
 
 **注意:** 保守キー、署名秘密鍵、トークン、AWSアクセスキー、顧客の実データはGitHubにコミットしないこと。
