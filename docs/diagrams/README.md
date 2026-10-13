@@ -8,7 +8,7 @@
 
 - 顧客企業のWPFアプリ → AWS WAF（導入提案） → API Gateway REST API（推奨案） → API Lambda（FastAPI + Mangum）
 - API LambdaからWorker Lambdaを非同期呼び出しし、WorkerがAmazon Bedrockを呼ぶ
-- DynamoDB Customers / Jobs、生成CSVのS3保存
+- DynamoDBは**サービスアイコン1つの枠**にCustomers / Jobs / UsageEvents（検討案）を表示。これはテーブル群を視覚的に整理した表現であり、物理分割の確定を意味しない。生成CSVはS3に保存
 - **UsageEventsの物理的な別テーブル化は未決定**。請求実績の分離・権限制御・監査の検討内容は [請求データ設計メモ](../billing-data-design-notes.md) を参照
 - CloudTrail、GuardDuty、CloudWatch、Secrets Manager、請求監査証跡S3は導入・運用設計の検討対象
 - 専用AWS KMSカスタマー管理キーは現時点で不採用。DynamoDBの標準暗号化・S3 SSE-S3は維持
