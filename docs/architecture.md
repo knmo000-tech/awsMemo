@@ -1,18 +1,18 @@
 # Bedrock 非同期API 構成設計（FastAPI採用版）
 
-> ステータス: 設計ドラフト / 2026-10-13。FastAPI採用とLambda 2関数構成は確定方針。API Gatewayの種類とWAF接続方式は検討中。**専用のKMSカスタマー管理キーは不採用（標準暗号化は継続）**。設計判断の理由と経緯は [ADR](adr/README.md) に記録する。
+> ステータス: 設計ドラフト / 2026-10-13。FastAPI採用とLambda 2関数構成は確定方針。API Gateway REST API＋AWS WAFの採用は設計確定。**専用のKMSカスタマー管理キーは不採用（標準暗号化は継続）**。設計判断の理由と経緯は [ADR](adr/README.md) に記録する。
 
 ## 構成概要
 
 WPF（.NET Framework 4.8）から HTTPS で API Gateway を通じて、**FastAPI + Mangum を載せた API Lambda** を呼び出す。1つの API Lambda が `POST /auth`、`POST /jobs`、`GET /jobs/{jobId}` を処理する。**Worker Lambda** が非同期で Amazon Bedrock を呼び、CSVをS3に保存する。
 
-### セキュリティ追加後の構成候補（REST API + WAFを推奨）
+### セキュリティ追加後の構成（REST API + WAF採用）
 
 ```mermaid
 flowchart TD
     C["WPFクライアント"] -->|"HTTPS"| WF["AWS WAF<br/>マネージドルール・レート制限"]
     subgraph AWS["AWS Cloud"]
-      WF --> GW["API Gateway REST API<br/>選定提案"]
+      WF --> GW["API Gateway REST API<br/>採用方針"]
       GW --> A["API Lambda<br/>FastAPI + Mangum"]
       A -->|"非同期Invoke"| W["Worker Lambda<br/>Python / Bedrock処理"]
       A <--> D[("DynamoDB<br/>Customers / Jobs")]
@@ -21,7 +21,7 @@ flowchart TD
       W --> B["Amazon Bedrock"]
       W --> S[("S3<br/>生成CSV")]
       A -->|"署名付きURL発行"| S
-      SM["Secrets Manager"] -.->|"秘密鍵取得"| A
+      SM["Secrets Manager"] -.->|"JWT署名鍵取得"| A
       CT["CloudTrail<br/>AWS操作監査"] -.-> AUDIT[("監査ログ保存先S3")]
       GD["GuardDuty<br/>脅威検出"] --> EV["EventBridge → SNS等<br/>通知"]
       LOG["CloudWatch<br/>APIアクセス・Lambdaログ/アラーム"]
@@ -34,16 +34,18 @@ flowchart TD
 
 **注:** CloudTrail / GuardDuty の破線等は監査・保護の論理関係であり、リクエストの通信経路ではない。GuardDutyは検知サービスで、自動ブロックには別の対処設定が必要。S3のURLは認可確認後だけ発行する。
 
-## API Gatewayの選択（要決定）
+## API Gatewayの選定（採用決定）
 
 | 案 | ネットワーク構成 | WAF | 備考 |
 | --- | --- | --- | --- |
-| **A: 推奨** | WPF → API Gateway **REST API** → API Lambda | REST APIステージに直接紐づけ可能 | シンプルだがHTTP APIより一般に高コスト |
+| **A: 採用** | WPF → API Gateway **REST API** → API Lambda | REST APIステージに直接紐づけ可能 | **採用確定**。シンプルだがHTTP APIより一般に高コスト |
 | B | WPF → CloudFront + WAF → API Gateway **HTTP API** → API Lambda | CloudFrontに紐づける | API Gatewayへの直接迂回を防ぐ構成が別途必要 |
 
 AWS公式比較: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html
 
-REST API採用時は Lambda プロキシ統合で `ANY /{proxy+}` を API Lambda に接続（必要に応じてルート `/` も設定）。Mangum が API Gateway のイベントを FastAPI の ASGI 呼び出しへ変換する。API GatewayとFastAPIで重複するパス検証やCORS設定に注意する。
+REST APIはAPI Gateway APIキーを要求しない（`apiKeyRequired=false`）。`POST /auth` は既存保守キーと顧客名をDynamoDBで照合し、JWTを発行。後続エンドポイントではFastAPIがJWTを検証する。認証用のAPI Gateway追加キーを配布しない。
+
+REST APIでは Lambda プロキシ統合で `ANY /{proxy+}` を API Lambda に接続（必要に応じてルート `/` も設定）。Mangum が API Gateway のイベントを FastAPI の ASGI 呼び出しへ変換する。API GatewayとFastAPIで重複するパス検証やCORS設定に注意する。
 
 ## Lambdaごとの責務
 
@@ -99,7 +101,7 @@ handler = Mangum(app)
 | ApiLambdaExecutionRole | `dynamodb:PutItem` | Jobs保存 |
 | ApiLambdaExecutionRole | `lambda:InvokeFunction` | Worker Lambdaを非同期起動 |
 | ApiLambdaExecutionRole | `s3:GetObject` | 結果ダウンロードURLの署名に利用 |
-| ApiLambdaExecutionRole | `secretsmanager:GetSecretValue` | 署名秘密鍵の取得（採用時のみ） |
+| ApiLambdaExecutionRole | `secretsmanager:GetSecretValue` | JWT署名秘密鍵の取得（採用） |
 | WorkerLambdaExecutionRole | `bedrock:InvokeModel` | 許可したモデル/推論プロファイルだけ |
 | WorkerLambdaExecutionRole | `dynamodb:UpdateItem` | Jobsの状態更新 |
 | WorkerLambdaExecutionRole（請求設計案） | `dynamodb:PutItem` | UsageEventsへの条件付き新規追記（既存レコードは上書きさせない） |
@@ -137,7 +139,7 @@ handler = Mangum(app)
 
 ## 設計上の未決事項
 
-1. **REST API+WAFに変更するか**、HTTP API+CloudFront+WAFを採るか。
+1. **REST API＋WAFは採用決定済み**。WAFルールや閾値、スロットリングの具体値を決める。
 2. 保守キーの形・顧客照合方法・署名済みアクセストークンと失効仕様。
 3. Bedrockのモデル・出力CSVの仕様・課金/クォータ。
 4. ジョブ/成果物保持期間、監査ログ保存期間、求める監査証跡の粒度。
