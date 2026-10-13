@@ -1,6 +1,9 @@
 # API仕様書（ドラフト）
 
-API Gateway HTTP API + 1つのAPI Lambdaを想定。リクエストとレスポンスはJSON（UTF-8）。`/auth` 以外は `Authorization: Bearer <accessToken>` が必要です。
+> **更新方針（2026-10-13）**: API実装にFastAPI + Mangumを採用する。API Gatewayは **REST API + AWS WAFを推奨案** とし、採用決定まではHTTP APIからの変更を「検討中」として扱う。公開エンドポイントのパスとJSON例は維持する。OpenAPIはFastAPIから生成可能だが、本番で`/docs`や`/openapi.json`を公開するかは別途決める。
+
+
+API Gateway REST API + AWS WAFを推奨案とする（API Gateway種類は検討中）。FastAPI + Mangumを載せた1つのAPI Lambdaを想定。リクエストとレスポンスはJSON（UTF-8）。`/auth` 以外は `Authorization: Bearer <accessToken>` が必要です。
 
 | HTTP | エンドポイント | 成功コード | 役割 |
 | --- | --- | --- | --- |
@@ -61,3 +64,16 @@ Response 200（失敗）:
 - ポーリング間隔、入力長、タイムアウト、CSV形式、ダウンロードURL期限は要確定。
 
 関連: [構成設計](architecture.md) / [シーケンス](sequence.md)
+
+
+## FastAPIとAPI Gatewayの責務
+
+- API Gateway: HTTPS受付、WAFとの連携（REST API採用時）、アクセスログ、スロットリング、Lambda呼び出し。
+- FastAPI: ルーティング、Pydanticの型検証、Bearerトークンの**実際の検証処理**、顧客の認可、APIレスポンス。
+- Mangum: API GatewayイベントとFastAPIのASGIリクエスト/レスポンスの変換。
+- Lambda: FastAPIアプリを`handler = Mangum(app)`で実行。ZIP/コンテナにFastAPI/Mangumなどの依存関係を同梱する。
+- 既定のFastAPIバリデーションエラーはHTTP 422・独自JSON形式。**本仕様の400/共通エラー形式に合わせるにはRequestValidationError用の例外ハンドラーが必要**。422を採用するかも決定する。
+- AWS WAF/API Gateway側が生成する403/429/5xxはFastAPIの例外ハンドラーを通らないため、共通エラー形式を保証するにはGateway Responses等の設定やクライアント側の別処理が必要。
+- `/auth` の保守キーは認証材料であるため、API Gatewayアクセスログ、WAFログ、FastAPIログに出力しない。入力本文、Bearerトークン、署名付きURLも秘匿する。
+
+詳細: [セキュリティ・監査設計](security.md) / [構成設計](architecture.md)
