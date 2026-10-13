@@ -20,7 +20,7 @@
 | **AWS KMS** | 暗号鍵の制御・監査 | **要件次第**。S3/DynamoDBの顧客管理キー（CMK）は監査要件を見て採否判断 | デフォルト暗号化も存在。キー料金・API呼び出し料金・IAM設定の負担が増える |
 | **CloudWatch** | HTTP/API・Lambdaの運用ログとアラーム | **推奨**。APIアクセスログ + Lambdaアプリ監査ログ | 個人情報・認証情報・生成内容は記録しない |
 | **Secrets Manager** | 秘密情報保管・更新 | **推奨**。トークン署名鍵等に使用 | 平文の環境変数やソースコード埋め込みを避ける |
-| **CloudWatch Budgets / Cost Anomaly Detection** | Bedrock・WAF等の請求異常 | **推奨** | 予算超過通知は自動的な遮断ではない |
+| **AWS Budgets / Cost Anomaly Detection** | Bedrock・WAF等の請求異常 | **推奨** | 予算超過通知は自動的な遮断ではない |
 
 ## 3. WAF設計
 
@@ -93,7 +93,15 @@ AWS公式: https://docs.aws.amazon.com/guardduty/latest/ug/s3-protection.html
 
 AWS公式: https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-bucket-encryption.html
 
-## 8. 権限と運用設計
+## 8. Bedrock固有の監査・情報保護
+
+- Bedrockへの呼び出しはWorker Lambdaが行う。CloudTrailのAWS操作証跡と、アプリ監査ログの `jobId` / `customerId` を関連づける。
+- Bedrockの**モデル呼び出しログ（Model invocation logging）**の導入は、顧客データの取り扱い方針と保存先のアクセス管理・保存期限を確認してから判断する。設定によっては**プロンプトやモデル応答そのものがログに含まれる**ため、無条件では有効にしない。
+- 顧客ごとの月間上限、同時実行数、Workerの予約済み同時実行、Bedrockクォータ、異常請求検知を組み合わせる。WAFだけでAI利用料金の悪用を防げるわけではない。
+
+AWS公式: https://docs.aws.amazon.com/bedrock/latest/userguide/model-invocation-logging.html
+
+## 9. 権限と運用設計
 
 - **実行ロール**は API LambdaとWorker Lambdaで分離。API Lambdaに `bedrock:InvokeModel` 権限を付与しない。
 - **管理者/デプロイ担当ロール**は実行ロールとは分離。`iam:PassRole` も必要なロールのみに制限する。
@@ -101,11 +109,11 @@ AWS公式: https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-bucket-
 - CloudWatchメトリクス: APIの4xx/5xx、認証失敗率、Workerエラー/タイムアウト、ジョブの`QUEUED`滞留、Bedrock呼び出し失敗、GuardDuty High/Critical findings、WAF Block数。
 - 本番運用で必要なインシデント対応手順: キー失効、API入口の制限、Worker同時実行数/Bedrock呼び出し抑止、証跡の保全、復旧確認。
 
-## 9. コストに関する注意
+## 10. コストに関する注意
 
 WAF（Web ACL/ルール/リクエスト/ログ）、CloudTrail（追加Trail・データイベント・ログ保管）、GuardDuty（分析データ量/オプション）、KMS（CMK数とリクエスト）、CloudWatch Logs（取り込み・保存）、Secrets Manager（シークレット数/呼び出し）は**課金対象になり得る**。構成案確定後にリージョン別の利用量で見積もる。
 
-## 10. 実装前に確認すべきこと
+## 11. 実装前に確認すべきこと
 
 1. 想定API呼び出し数、利用顧客数、ピーク時の認証頻度。
 2. REST API+WAF採用の可否、ネットワーク制限（接続元IP制限やVPN利用の有無）。
