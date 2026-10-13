@@ -14,14 +14,15 @@ WPF（.NET Framework 4.8）から AWS の Amazon Bedrock を利用してCSVを�
 - **WAF直接連携のためAPI Gateway REST APIへの変更を推奨**（まだ選定中）。
 - ドキュメントは設計ドラフトです。AWS環境への構築・設定はまだ行っていません。
 
-## AWS構成図
+## AWS構成図（リビジョン別）
 
-- [編集用 .drawio](docs/diagrams/aws-architecture.drawio) — diagrams.net（draw.io）で編集可能
-- [閲覧用 SVG](docs/diagrams/aws-architecture.svg) — GitHub上でもブラウザで表示可能
+- **[rev2 最新の推奨構成図（SVG）](docs/diagrams/aws-architecture-rev2.svg)** / [draw.ioで編集](docs/diagrams/aws-architecture-rev2.drawio)
+- [rev1 変更前の図（SVG）](docs/diagrams/aws-architecture-rev1.svg) / [draw.io](docs/diagrams/aws-architecture-rev1.drawio)
+- [rev1/rev2の採用・不採用範囲と補足](docs/diagrams/README.md)
 
-![AWS構成図（現行設計）](docs/diagrams/aws-architecture.svg)
+![rev2 構成図](docs/diagrams/aws-architecture-rev2.svg)
 
-**凡例:** API Lambda / Worker Lambda / Bedrockは採用方針。WAF・REST APIは推奨案、UsageEvents別テーブル化は検討中、専用KMS顧客管理キーは不採用（標準暗号化は継続）。
+**注:** rev2は「推奨採用するサービスを含む構成案」でありAWS環境への設定完了を意味しません。専用KMS顧客管理キーは不採用、UsageEventsの物理別テーブル化は検討中です。
 
 ## 設計書
 
