@@ -9,9 +9,9 @@ WPF（.NET Framework 4.8）から AWS の Amazon Bedrock を利用してCSVを�
 - **Worker Lambda 1つ**がBedrockを非同期実行し、結果CSVをS3に保存する。
 - DynamoDBで認証/ジョブを管理。Lambda実行ロールはAPI用とWorker用で分離する。
 - 複数顧客企業向けに、**Bedrockのトークン使用量を保存し独自料金で請求**。請求根拠の完全性・監査・復旧を最優先する。
-- WAF・CloudTrail・GuardDuty・CloudWatch・Secrets Managerの導入範囲を検討している。
+- **REST API＋AWS WAFを採用**し、既存の保守キー認証を維持する。API Gateway独自のAPIキーを顧客へ配布しない。自前JWTの秘密鍵管理に**Secrets Managerを採用**。CloudTrail・GuardDuty・CloudWatchの導入詳細は引き続き検討する。
 - **KMSの専用カスタマー管理キーは現時点で不採用**。DynamoDB/S3の標準保存時暗号化を維持し、請求データにはIAM最小権限、冪等性・追記型明細、監査ログ、PITRなどを優先する。
-- **WAF直接連携のためAPI Gateway REST APIへの変更を推奨**（まだ選定中）。
+- **API Gateway REST API＋WAFは採用決定済み**。
 - ドキュメントは設計ドラフトです。AWS環境への構築・設定はまだ行っていません。
 
 ## AWS構成図（リビジョン別）
