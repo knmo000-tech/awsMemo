@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080"><defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#507da6"/></marker><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#8a69b8"/></marker><marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#6797a8"/></marker></defs><rect width="1920" height="1080" fill="#fff"/>
+<text x="43" y="77" font-family="Noto Sans CJK JP,sans-serif" font-size="36" fill="#203c5b" font-weight="700" text-anchor="start">AWS Bedrock 非同期API  |  システム構成</text>
+<text x="43" y="121" font-family="Noto Sans CJK JP,sans-serif" font-size="19" fill="#677d93" font-weight="400" text-anchor="start">複数顧客企業向け   /   FastAPI + Mangum   /   2026-10-13   /   設計ドラフト</text>
+<rect x="45" y="168" width="265" height="795" rx="15" fill="#f8fbff" stroke="#a0b8d1" stroke-width="2" stroke-dasharray="8 5"/>
+<text x="69" y="208" font-family="Noto Sans CJK JP,sans-serif" font-size="24" fill="#466582" font-weight="700" text-anchor="start">顧客企業</text>
+<text x="69" y="235" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#6b7e93" font-weight="400" text-anchor="start">インターネット利用</text>
+<rect x="338" y="168" width="1538" height="795" rx="15" fill="#f8fbff" stroke="#a0b8d1" stroke-width="2" stroke-dasharray="8 5"/>
+<text x="362" y="208" font-family="Noto Sans CJK JP,sans-serif" font-size="24" fill="#466582" font-weight="700" text-anchor="start">AWS Cloud</text>
+<text x="362" y="235" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#6b7e93" font-weight="400" text-anchor="start">アプリ実行・保存・監査</text>
+<text x="392" y="546" font-family="Noto Sans CJK JP,sans-serif" font-size="21" fill="#395d80" font-weight="700" text-anchor="start">業務データ・成果物</text>
+<text x="390" y="769" font-family="Noto Sans CJK JP,sans-serif" font-size="20" fill="#466580" font-weight="700" text-anchor="start">セキュリティ・監査（導入提案・設定未実施）</text>
+<polyline points="285,354 382,354" stroke="#507da6" stroke-width="3" stroke-linejoin="round" fill="none"  marker-end="url(#a)"/>
+<polyline points="597,354 655,354" stroke="#507da6" stroke-width="3" stroke-linejoin="round" fill="none"  marker-end="url(#a)"/>
+<polyline points="890,354 945,354" stroke="#507da6" stroke-width="3" stroke-linejoin="round" fill="none"  marker-end="url(#a)"/>
+<polyline points="1255,354 1338,354" stroke="#507da6" stroke-width="3" stroke-linejoin="round" fill="none"  marker-end="url(#a)"/>
+<polyline points="1603,354 1653,354" stroke="#507da6" stroke-width="3" stroke-linejoin="round" fill="none"  marker-end="url(#a)"/>
+<polyline points="1010,435 1010,491 723,491 723,563" stroke="#507da6" stroke-width="3" stroke-linejoin="round" fill="none"  marker-end="url(#a)"/>
+<polyline points="1100,435 1100,526 997,526 997,563" stroke="#507da6" stroke-width="3" stroke-linejoin="round" fill="none"  marker-end="url(#a)"/>
+<polyline points="1420,431 1420,531 1290,531 1290,563" stroke="#8a69b8" stroke-width="3" stroke-linejoin="round" fill="none" stroke-dasharray="9 6" marker-end="url(#b)"/>
+<polyline points="1519,431 1519,489 1695,489 1695,563" stroke="#507da6" stroke-width="3" stroke-linejoin="round" fill="none"  marker-end="url(#a)"/>
+<polyline points="177,416 177,718 1695,718 1695,679" stroke="#6797a8" stroke-width="3" stroke-linejoin="round" fill="none" stroke-dasharray="9 6" marker-end="url(#c)"/>
+<rect x="75" y="291" width="210" height="125" rx="15" fill="#e8eff9" stroke="#739ac4" stroke-width="2.5" />
+<text x="180" y="330.25" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#284766" font-weight="700" text-anchor="middle">WPFアプリ</text>
+<text x="180" y="353.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#284766" font-weight="400" text-anchor="middle">.NET Framework 4.8</text>
+<text x="180" y="377.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#284766" font-weight="400" text-anchor="middle">顧客企業のPC</text>
+<rect x="382" y="291" width="215" height="125" rx="15" fill="#fff2d9" stroke="#c99736" stroke-width="2.5" />
+<text x="489.5" y="330.25" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#79501b" font-weight="700" text-anchor="middle">AWS WAF</text>
+<text x="489.5" y="353.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#79501b" font-weight="400" text-anchor="middle">推奨 / 検討中</text>
+<text x="489.5" y="377.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#79501b" font-weight="400" text-anchor="middle">HTTP攻撃・レート制御</text>
+<rect x="655" y="291" width="235" height="125" rx="15" fill="#fff2d9" stroke="#c99736" stroke-width="2.5" />
+<text x="772.5" y="330.25" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#79501b" font-weight="700" text-anchor="middle">API Gateway</text>
+<text x="772.5" y="353.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#79501b" font-weight="400" text-anchor="middle">REST API（推奨案）</text>
+<text x="772.5" y="377.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#79501b" font-weight="400" text-anchor="middle">WAF直接連携</text>
+<rect x="945" y="272" width="310" height="163" rx="15" fill="#e6f3ff" stroke="#5c8fb9" stroke-width="2.5" />
+<text x="1100" y="318.5" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#1e4d73" font-weight="700" text-anchor="middle">API Lambda</text>
+<text x="1100" y="342" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">FastAPI + Mangum</text>
+<text x="1100" y="365.5" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">POST /auth・POST /jobs</text>
+<text x="1100" y="389" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">GET /jobs/{jobId}</text>
+<rect x="1338" y="278" width="265" height="153" rx="15" fill="#e6f3ff" stroke="#5c8fb9" stroke-width="2.5" />
+<text x="1470.5" y="331.25" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#1e4d73" font-weight="700" text-anchor="middle">Worker Lambda</text>
+<text x="1470.5" y="354.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">Bedrockを非同期実行</text>
+<text x="1470.5" y="378.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">ジョブ・トークン実績を記録</text>
+<rect x="1653" y="291" width="195" height="125" rx="15" fill="#e6f3ff" stroke="#5c8fb9" stroke-width="2.5" />
+<text x="1750.5" y="330.25" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#1e4d73" font-weight="700" text-anchor="middle">Amazon Bedrock</text>
+<text x="1750.5" y="353.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">文章生成</text>
+<text x="1750.5" y="377.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">実トークン使用量を返す</text>
+<rect x="610" y="563" width="225" height="116" rx="15" fill="#e6f3ff" stroke="#5c8fb9" stroke-width="2.5" />
+<text x="722.5" y="597.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#1e4d73" font-weight="700" text-anchor="middle">DynamoDB</text>
+<text x="722.5" y="621.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">Customers</text>
+<text x="722.5" y="644.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">顧客・保守キー照合</text>
+<rect x="885" y="563" width="225" height="116" rx="15" fill="#e6f3ff" stroke="#5c8fb9" stroke-width="2.5" />
+<text x="997.5" y="597.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#1e4d73" font-weight="700" text-anchor="middle">DynamoDB</text>
+<text x="997.5" y="621.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">Jobs</text>
+<text x="997.5" y="644.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">ジョブ状態を管理</text>
+<rect x="1160" y="563" width="265" height="116" rx="15" fill="#f4edff" stroke="#9474be" stroke-width="2.5" stroke-dasharray="8 6"/>
+<text x="1292.5" y="597.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#624385" font-weight="700" text-anchor="middle">DynamoDB</text>
+<text x="1292.5" y="621.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#624385" font-weight="400" text-anchor="middle">UsageEvents（案）</text>
+<text x="1292.5" y="644.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#624385" font-weight="400" text-anchor="middle">請求実績 / 別表検討</text>
+<rect x="1570" y="563" width="250" height="116" rx="15" fill="#e6f3ff" stroke="#5c8fb9" stroke-width="2.5" />
+<text x="1695" y="597.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#1e4d73" font-weight="700" text-anchor="middle">Amazon S3</text>
+<text x="1695" y="621.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">CSVを非公開で保存</text>
+<text x="1695" y="644.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#1e4d73" font-weight="400" text-anchor="middle">署名付きURLで取得</text>
+<rect x="385" y="779" width="240" height="118" rx="15" fill="#edf1f6" stroke="#93a8bc" stroke-width="2.5" />
+<text x="505" y="814.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#3c5268" font-weight="700" text-anchor="middle">CloudWatch</text>
+<text x="505" y="838.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">API / アプリログ</text>
+<text x="505" y="861.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">監視・アラーム</text>
+<rect x="667" y="779" width="240" height="118" rx="15" fill="#edf1f6" stroke="#93a8bc" stroke-width="2.5" />
+<text x="787" y="814.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#3c5268" font-weight="700" text-anchor="middle">CloudTrail</text>
+<text x="787" y="838.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">AWS操作証跡</text>
+<text x="787" y="861.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">DB等の監査</text>
+<rect x="948" y="779" width="230" height="118" rx="15" fill="#edf1f6" stroke="#93a8bc" stroke-width="2.5" />
+<text x="1063" y="814.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#3c5268" font-weight="700" text-anchor="middle">GuardDuty</text>
+<text x="1063" y="838.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">不審な挙動を検出</text>
+<text x="1063" y="861.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">通知連携を検討</text>
+<rect x="1220" y="779" width="260" height="118" rx="15" fill="#edf1f6" stroke="#93a8bc" stroke-width="2.5" />
+<text x="1350" y="814.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#3c5268" font-weight="700" text-anchor="middle">Secrets Manager</text>
+<text x="1350" y="838.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">トークン署名鍵など</text>
+<text x="1350" y="861.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">秘密情報を管理</text>
+<rect x="1520" y="779" width="305" height="118" rx="15" fill="#edf1f6" stroke="#93a8bc" stroke-width="2.5" />
+<text x="1672.5" y="814.75" font-family="Noto Sans CJK JP,sans-serif" font-size="22" fill="#3c5268" font-weight="700" text-anchor="middle">S3 監査証跡</text>
+<text x="1672.5" y="838.25" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">確定請求明細・ログ</text>
+<text x="1672.5" y="861.75" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#3c5268" font-weight="400" text-anchor="middle">Object Lockは検討中</text>
+<rect x="1249" y="313" width="150" height="30" rx="8" fill="#fff" stroke="#dce5f0"/>
+<text x="1324" y="334" font-family="Noto Sans CJK JP,sans-serif" font-size="16" fill="#426c95" font-weight="700" text-anchor="middle">非同期Invoke</text>
+<rect x="768" y="702" width="320" height="29" rx="8" fill="#fff" stroke="#dce5f0"/>
+<text x="928" y="723" font-family="Noto Sans CJK JP,sans-serif" font-size="16" fill="#52889a" font-weight="700" text-anchor="middle">署名付きURLでCSV取得</text>
+<rect x="60" y="975" width="1804" height="69" rx="13" fill="#e7f3fd" stroke="#b6cfe5"/>
+<text x="80" y="1004" font-family="Noto Sans CJK JP,sans-serif" font-size="19" fill="#2c4e70" font-weight="700" text-anchor="start">KMS：専用カスタマー管理キー不採用 ／ S3 SSE-S3・DynamoDB標準暗号化を継続</text>
+<text x="80" y="1031" font-family="Noto Sans CJK JP,sans-serif" font-size="17" fill="#416788" font-weight="400" text-anchor="start">請求根拠を守る：IAM最小権限・追記型利用明細・監査・PITR ／ UsageEventsの別テーブル化は検討中</text>
+</svg>
