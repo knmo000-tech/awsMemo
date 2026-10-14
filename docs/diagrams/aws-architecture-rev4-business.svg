@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2720" height="1470" viewBox="0 0 2720 1470"><defs><marker id="blueArr" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#48779a"/></marker><marker id="violetArr" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs><rect width="2720" height="1470" fill="#fff"/>
-<text x="55" y="74" font-family="Noto Sans CJK JP, sans-serif" font-size="36" fill="#1e4262" font-weight="700" text-anchor="start">AWS Bedrock 非同期API  /  rev3 業務処理・データの流れ</text>
+<text x="55" y="74" font-family="Noto Sans CJK JP, sans-serif" font-size="36" fill="#1e4262" font-weight="700" text-anchor="start">AWS Bedrock 非同期API  /  rev4 業務処理・データの流れ</text>
 <text x="55" y="125" font-family="Noto Sans CJK JP, sans-serif" font-size="20" fill="#6e8499" font-weight="400" text-anchor="start">WPF / REST API / FastAPI / Bedrock / トークン使用量・JSON生成</text>
 <rect x="40" y="180" width="288" height="970" rx="16" fill="#f8fbff" stroke="#a6bdd4" stroke-dasharray="8 5" stroke-width="2"/>
 <text x="64" y="221" font-family="Noto Sans CJK JP, sans-serif" font-size="25" fill="#345d7f" font-weight="700" text-anchor="start">顧客企業</text>
