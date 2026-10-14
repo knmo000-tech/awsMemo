@@ -25,6 +25,8 @@
 | [ADR-0006](0006-audit-security.md) | CloudTrail / GuardDuty / CloudWatch / Secrets Manager / AWS Budgets | Secrets ManagerはJWT署名鍵管理として採用。他サービスは詳細設計中 | **一部採用・他は検討中** | AWS操作監査・脅威検出・顧客操作監査・秘密情報管理を分離 |
 | [ADR-0007](0007-output-json.md) | 生成物の形式 | JSONをS3に保存、ポーリングと非同期構成は維持 | **採用** | 成果物の要件がJSONに変更され、既存の非同期処理は維持するため |
 
+| [ADR-0008](0008-lambda-web-functions.md) | Lambda Web Functions | API Gateway REST API + WAF / Python FastAPI + Mangumを維持 | **現時点で不採用** | Node.jsへの移植とCloudFront + WAF構成の再設計が必要。現行3 APIでは明確な優位性なし |
+
 ## 決定の経緯
 
 | 日付 | 経緯 |
@@ -35,6 +37,8 @@
 | 2026-10-13 | 請求データの改ざん対策はKMSではなくIAM制限・追記型実績・監査・復旧が中心と整理。**KMS顧客管理キーを現時点で採用しないことを決定** |
 | 2026-10-13 | REST API + WAFの採用を確定。API Gatewayの追加APIキーは使わず、既存保守キー照合→JWT発行の認証方式を維持。自前JWTの署名鍵管理にSecrets Managerを採用 |
 | 2026-10-15 | 成果物をCSVからJSONへ変更。Lambda2関数、S3保存、ポーリングなど構成は維持（[ADR-0007](0007-output-json.md)） |
+
+| 2026-10-15 | Lambda Web Functionsを比較検討し、現行のAPI Gateway REST API + WAF / Python FastAPI構成を維持する方針を確認（[ADR-0008](0008-lambda-web-functions.md)） |
 
 ## 更新時のチェックリスト
 
