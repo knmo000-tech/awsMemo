@@ -4,7 +4,7 @@
 
 今回のシステムは、**複数の顧客企業が利用するWPFデスクトップアプリからAmazon BedrockでJSONを生成するサービス**。API受付とAI実行を分離し、顧客認証・ジョブ管理・利用量に基づく請求・監査まで考慮する。
 
-GitHubの図と併せて読む：[全体アーキテクチャ](https://github.com/knmo000-tech/awsMemo/blob/main/docs/architecture.md) ／ [業務構成図](https://github.com/knmo000-tech/awsMemo/blob/main/docs/diagrams/aws-architecture-rev4-business.svg) ／ [セキュリティ・監査図](https://github.com/knmo000-tech/awsMemo/blob/main/docs/diagrams/aws-architecture-rev4-security.svg)
+GitHubの図と併せて読む：[全体アーキテクチャ](../architecture.md) ／ [業務構成図](../diagrams/aws-architecture-rev4-business.svg) ／ [セキュリティ・監査図](../diagrams/aws-architecture-rev4-security.svg)
 
 ## 1. 最初に押さえる「登場人物の役割」
 
