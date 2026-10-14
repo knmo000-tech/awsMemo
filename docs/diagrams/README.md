@@ -3,12 +3,32 @@
 | 版 | 編集用 | 画像プレビュー | 内容 |
 | --- | --- | --- | --- |
 | **rev1** | [draw.io](aws-architecture-rev1.drawio) | [SVG](aws-architecture-rev1.svg) | 変更前の構成を凍結保存。DynamoDBは1つのサービス枠 |
-| **rev2** | [draw.io](aws-architecture-rev2.drawio) | [SVG](aws-architecture-rev2.svg) | **今回の推奨採用案**。CSV保存・監査ログ連携を明示 |
+| **rev2** | [draw.io](aws-architecture-rev2.drawio) | [SVG](aws-architecture-rev2.svg) | 前版。CSV保存・監査ログ連携を追加した段階（レイアウト調整前） |
+| **rev3（最新）** | **[draw.io（2ページ）](aws-architecture-rev3.drawio)** | **[業務処理SVG](aws-architecture-rev3-business.svg)** / **[セキュリティSVG](aws-architecture-rev3-security.svg)** | architecture.mdに照合し、業務・監査の線を分けて再配置 |
 | 旧互換パス | [draw.io](aws-architecture.drawio) | [SVG](aws-architecture.svg) | rev1相当の旧リンク（既存の参照用） |
 
-![rev2 AWS構成図](aws-architecture-rev2.svg)
+### rev3：業務処理・データの流れ
 
-## rev2で採用する方向のサービス
+![rev3 業務処理](aws-architecture-rev3-business.svg)
+
+### rev3：セキュリティ・監査
+
+![rev3 セキュリティ監査](aws-architecture-rev3-security.svg)
+
+**編集:** 2ページを1ファイルにまとめた [aws-architecture-rev3.drawio](aws-architecture-rev3.drawio) を diagrams.net で開く。rev1・rev2は変更せず保存している。
+
+### architecture.mdとの対応確認（2026-10-14）
+
+- 採用確定: REST API＋WAF、API Lambda（FastAPI＋Mangum）、Worker Lambdaの非同期実行、既存保守キーのDynamoDB照合とJWT、Secrets Manager。
+- データと結果: DynamoDB内にCustomers / Jobsを表示し、UsageEventsの物理別テーブル化は**検討中**。WorkerからBedrock呼び出し、S3へのCSV保存をそれぞれ表示。API Lambdaによる署名URL生成と、WPFからS3へのCSV取得は別線。
+- セキュリティ・監査: CloudWatchでAPI/Lambdaログ、CloudTrailでAWS操作監査・監査専用S3保存、GuardDuty→EventBridge→SNSの通知案を別ページに表示。実際の監視や通知設定は未実施。
+- IAMと暗号化: API/Workerの実行ロール分離、専用KMSカスタマー管理キー不採用（標準暗号化は利用）を表示。
+- rev3では線と文字が重なりにくいよう配置を変更。**SVGの接続ラベルとサービス枠の座標衝突を検査し0件**。draw.io側も同じ配置・ラベルに調整した。ただしビューアやフォントによる見え方は差が出る可能性がある。
+
+図中のAWS WAFはREST APIステージに関連付けるWeb ACLを論理的に前段に示しており、独立したHTTP中継サービスを意味しない。
+
+
+## rev3に反映した採用・導入推奨サービス
 
 - **AWS WAF + API Gateway REST API**: インターネット公開APIの保護とアクセス制限。HTTP APIへのWAF直接接続はできないためREST APIを推奨。
 - **CloudWatch**: API Gatewayアクセスログ、API Lambda/Worker Lambdaの実行・アプリ監査ログ、メトリクス・アラーム。
@@ -38,4 +58,4 @@
 AWS公式アイコン: https://aws.amazon.com/architecture/icons/  
 図の生成時に参照した公開カタログ: https://github.com/phergoualch/aws-icons
 
-判断の経緯は [ADR一覧](../adr/README.md) を参照。図のrev2は設計比較用の版として扱い、正式な採用判断はADRで記録する。
+判断の経緯は [ADR一覧](../adr/README.md) を参照。図のrev3は現在の設計の見取り図、rev1・rev2は比較用の版として扱い、正式な採用判断はADRで記録する。
