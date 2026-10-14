@@ -16,13 +16,16 @@ WPF（.NET Framework 4.8）から AWS の Amazon Bedrock を利用してCSVを�
 
 ## AWS構成図（リビジョン別）
 
-- **[rev2 最新の推奨構成図（SVG）](docs/diagrams/aws-architecture-rev2.svg)** / [draw.ioで編集](docs/diagrams/aws-architecture-rev2.drawio)
+- **[rev3 最新：業務処理図（SVG）](docs/diagrams/aws-architecture-rev3-business.svg)** / **[セキュリティ・監査図（SVG）](docs/diagrams/aws-architecture-rev3-security.svg)** / [draw.io 2ページ編集](docs/diagrams/aws-architecture-rev3.drawio)
+- [rev2 旧版（SVG）](docs/diagrams/aws-architecture-rev2.svg) / [draw.io](docs/diagrams/aws-architecture-rev2.drawio)
 - [rev1 変更前の図（SVG）](docs/diagrams/aws-architecture-rev1.svg) / [draw.io](docs/diagrams/aws-architecture-rev1.drawio)
-- [rev1/rev2の採用・不採用範囲と補足](docs/diagrams/README.md)
+- [rev1〜rev3の比較・照合結果と補足](docs/diagrams/README.md)
 
-![rev2 構成図](docs/diagrams/aws-architecture-rev2.svg)
+![rev3 業務構成図](docs/diagrams/aws-architecture-rev3-business.svg)
 
-**注:** rev2は「推奨採用するサービスを含む構成案」でありAWS環境への設定完了を意味しません。専用KMS顧客管理キーは不採用、UsageEventsの物理別テーブル化は検討中です。
+![rev3 セキュリティ・監査図](docs/diagrams/aws-architecture-rev3-security.svg)
+
+**注:** rev3は`docs/architecture.md`と照合して更新した「推奨採用するサービスを含む構成案」でありAWS環境への設定完了を意味しません。専用KMS顧客管理キーは不採用、UsageEventsの物理別テーブル化は検討中です。
 
 ## デザインレビュー資料（草稿 v0.2）
 
