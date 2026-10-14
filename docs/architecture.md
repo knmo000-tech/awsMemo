@@ -2,16 +2,18 @@
 
 > ステータス: 設計ドラフト / 2026-10-13。FastAPI採用とLambda 2関数構成は確定方針。API Gateway REST API＋AWS WAFの採用は設計確定。**専用のKMSカスタマー管理キーは不採用（標準暗号化は継続）**。設計判断の理由と経緯は [ADR](adr/README.md) に記録する。
 
+> **出力形式の更新（2026-10-15）**：生成物をCSVから**JSON**に変更。非同期2 Lambda・S3保存・署名付きURL取得・`GET /jobs/{jobId}`によるポーリングは変更しない。詳細は[ADR-0007](adr/0007-output-json.md)。
+
 ## 構成概要
 
-WPF（.NET Framework 4.8）から HTTPS で API Gateway を通じて、**FastAPI + Mangum を載せた API Lambda** を呼び出す。1つの API Lambda が `POST /auth`、`POST /jobs`、`GET /jobs/{jobId}` を処理する。**Worker Lambda** が非同期で Amazon Bedrock を呼び、CSVをS3に保存する。
+WPF（.NET Framework 4.8）から HTTPS で API Gateway を通じて、**FastAPI + Mangum を載せた API Lambda** を呼び出す。1つの API Lambda が `POST /auth`、`POST /jobs`、`GET /jobs/{jobId}` を処理する。**Worker Lambda** が非同期で Amazon Bedrock を呼び、JSONをS3に保存する。
 
 ### セキュリティ追加後の構成（REST API + WAF採用）
 
-**最新の編集可能な構成図（rev3）**
-- [draw.io構成図（業務処理・セキュリティ監査の2ページ）](diagrams/aws-architecture-rev3.drawio)
-- [業務処理・データフロー（SVG）](diagrams/aws-architecture-rev3-business.svg)
-- [セキュリティ・監査（SVG）](diagrams/aws-architecture-rev3-security.svg)
+**最新の編集可能な構成図（rev4）**
+- [draw.io構成図（業務処理・セキュリティ監査の2ページ）](diagrams/aws-architecture-rev4.drawio)
+- [業務処理・データフロー（SVG）](diagrams/aws-architecture-rev4-business.svg)
+- [セキュリティ・監査（SVG）](diagrams/aws-architecture-rev4-security.svg)
 
 図では見やすさのためDynamoDBアイコンを1つとし、その内部にCustomers / Jobs / UsageEvents（案）を並べている。**UsageEventsの別テーブル採用はまだ確定していない。** 監査・ログ・通知の線は独立ページに分離した。
 
@@ -32,7 +34,7 @@ flowchart TD
       A <--> J
       W -->|"状態更新"| J
       W -.->|"利用量記録（案）"| U
-      W -->|"生成CSV保存"| S[("Amazon S3<br/>CSV成果物")]
+      W -->|"生成JSON保存"| S[("Amazon S3<br/>JSON成果物")]
       A -.->|"署名付きURL発行"| S
       A -.->|"JWT署名鍵取得"| SM["Secrets Manager"]
       CT["CloudTrail<br/>AWS操作監査"] -.-> AUDIT[("S3<br/>監査ログ保存")]
@@ -43,7 +45,7 @@ flowchart TD
       A -.-> LOG
       W -.-> LOG
     end
-    C -.->|"署名URLでCSVダウンロード"| S
+    C -.->|"署名URLでJSONダウンロード"| S
 ```
 
 **注:** CloudTrail / GuardDuty の破線等は監査・保護の論理関係であり、リクエストの通信経路ではない。GuardDutyは検知サービスで、自動ブロックには別の対処設定が必要。S3のURLは認可確認後だけ発行する。
@@ -65,8 +67,8 @@ REST APIでは Lambda プロキシ統合で `ANY /{proxy+}` を API Lambda に�
 
 | Lambda | 役割 | エンドポイント |
 | --- | --- | --- |
-| API Lambda | 顧客/保守キー照合、アクセストークン発行・検証、顧客ごとのジョブ認可、ジョブ登録・状態照会、CSV署名付きURL作成 | `POST /auth`, `POST /jobs`, `GET /jobs/{jobId}` |
-| Worker Lambda | ジョブ開始/完了/失敗の状態更新、Bedrock実行、CSV生成・S3保存 | 公開HTTPエンドポイントなし |
+| API Lambda | 顧客/保守キー照合、アクセストークン発行・検証、顧客ごとのジョブ認可、ジョブ登録・状態照会、JSON署名付きURL作成 | `POST /auth`, `POST /jobs`, `GET /jobs/{jobId}` |
+| Worker Lambda | ジョブ開始/完了/失敗の状態更新、Bedrock実行、JSON生成・S3保存 | 公開HTTPエンドポイントなし |
 
 ### FastAPIでのルーティング例（説明用・未実装）
 
@@ -119,7 +121,7 @@ handler = Mangum(app)
 | WorkerLambdaExecutionRole | `bedrock:InvokeModel` | 許可したモデル/推論プロファイルだけ |
 | WorkerLambdaExecutionRole | `dynamodb:UpdateItem` | Jobsの状態更新 |
 | WorkerLambdaExecutionRole（請求設計案） | `dynamodb:PutItem` | UsageEventsへの条件付き新規追記（既存レコードは上書きさせない） |
-| WorkerLambdaExecutionRole | `s3:PutObject` | 結果CSV書き込み |
+| WorkerLambdaExecutionRole | `s3:PutObject` | 結果JSON書き込み |
 | 両実行ロール | CloudWatch Logs書き込み | 実行ログ |
 
 **専用KMSカスタマー管理キーは不採用。** DynamoDBの既定暗号化とS3 SSE-S3を継続する。課金実績の改ざん防止はIAM制限・条件付き追記・監査と復旧で対処する（[ADR-0004](adr/0004-no-customer-kms.md)）。API Lambdaに `bedrock:InvokeModel` は付けない。
@@ -155,7 +157,7 @@ handler = Mangum(app)
 
 1. **REST API＋WAFは採用決定済み**。WAFルールや閾値、スロットリングの具体値を決める。
 2. 保守キーの形・顧客照合方法・署名済みアクセストークンと失効仕様。
-3. Bedrockのモデル・出力CSVの仕様・課金/クォータ。
+3. Bedrockのモデル・出力JSONの仕様・課金/クォータ。
 4. ジョブ/成果物保持期間、監査ログ保存期間、求める監査証跡の粒度。
 5. **専用KMS顧客管理キーは採用しないと決定済み**。顧客契約や監査要件が変わった場合のみ再評価 ([ADR-0004](adr/0004-no-customer-kms.md))。
 6. WAFの閾値、正規顧客のアクセス傾向、GuardDutyの通知先。
