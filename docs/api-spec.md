@@ -2,6 +2,8 @@
 
 API Gateway REST API → FastAPI（Mangum）。JSONリクエスト／レスポンス。**API Gateway独自のAPIキーは不要**。
 
+WPFは`POST /auth`で取得したJWTをメモリに保持し、有効期限内は`POST /jobs`と`GET /jobs/{jobId}`で再利用する。未取得・期限切れ時（または401応答時）は再認証する。API LambdaはBearer JWTを毎リクエスト検証する。
+
 | メソッド | パス | 認証 | 成功 | 用途 |
 | --- | --- | --- | --- | --- |
 | `POST` | `/auth` | 保守キー＋顧客名 | 200 | JWT発行 |
