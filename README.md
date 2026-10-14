@@ -31,6 +31,10 @@
 | [設計レビュー資料](docs/reviews/aws-design-review-v0.2.md) | レビュー論点と質問 |
 | [ADR](docs/adr/README.md) | 採用・不採用の根拠と判断履歴 |
 
+## 個人学習用
+
+[構成の理解ノート（Markdown）](docs/learning/aws-architecture-guide.md) / [ブラウザで読む（HTML）](docs/learning/aws-architecture-guide.html)
+
 ## 未確定事項
 
 - 使用量データの物理テーブル設計と請求計算の詳細
