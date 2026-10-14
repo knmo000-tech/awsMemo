@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="2720" height="1470" viewBox="0 0 2720 1470"><defs><marker id="blueArr" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#48779a"/></marker><marker id="violetArr" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs><rect width="2720" height="1470" fill="#fff"/>
-<text x="55" y="74" font-family="Noto Sans CJK JP, sans-serif" font-size="36" fill="#1e4262" font-weight="700" text-anchor="start">AWS Bedrock 非同期API  /  rev3 セキュリティ・監査</text>
+<text x="55" y="74" font-family="Noto Sans CJK JP, sans-serif" font-size="36" fill="#1e4262" font-weight="700" text-anchor="start">AWS Bedrock 非同期API  /  rev4 セキュリティ・監査</text>
 <text x="55" y="125" font-family="Noto Sans CJK JP, sans-serif" font-size="20" fill="#6e8499" font-weight="400" text-anchor="start">業務リクエストの経路ではなく、ログ収集・AWS監査・脅威通知を示す</text>
 <rect x="50" y="178" width="2610" height="1160" rx="16" fill="#f8fbff" stroke="#a6bdd4" stroke-dasharray="8 5" stroke-width="2"/>
 <text x="74" y="219" font-family="Noto Sans CJK JP, sans-serif" font-size="25" fill="#345d7f" font-weight="700" text-anchor="start">AWS Cloud</text>
