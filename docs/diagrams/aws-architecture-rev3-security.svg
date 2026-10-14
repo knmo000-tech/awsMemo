@@ -85,7 +85,7 @@
 <text x="1372" y="729" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">通知イベント</text>
 <rect x="568" y="1076" width="256" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
 <text x="696" y="1095" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">GetSecretValue</text>
-<rect x="52" y="1185" width="2610" height="76" rx="12" fill="#eaf3fc" stroke="#cadbe9"/>
-<text x="70" y="1215" font-family="Noto Sans CJK JP, sans-serif" font-size="18" fill="#365a79" font-weight="700" text-anchor="start">サービスの違い</text>
-<text x="70" y="1242" font-family="Noto Sans CJK JP, sans-serif" font-size="17" fill="#365a79" font-weight="400" text-anchor="start">CloudWatch：API/アプリログ　｜　CloudTrail：AWS操作履歴　｜　GuardDuty：異常検知。通知にはEventBridge・SNS等の設定が必要</text>
+<rect x="52" y="1252" width="2610" height="76" rx="12" fill="#eaf3fc" stroke="#cadbe9"/>
+<text x="70" y="1282" font-family="Noto Sans CJK JP, sans-serif" font-size="18" fill="#365a79" font-weight="700" text-anchor="start">サービスの違い</text>
+<text x="70" y="1309" font-family="Noto Sans CJK JP, sans-serif" font-size="17" fill="#365a79" font-weight="400" text-anchor="start">CloudWatch：API/アプリログ　｜　CloudTrail：AWS操作履歴　｜　GuardDuty：異常検知。通知にはEventBridge・SNS等の設定が必要</text>
 </svg>
