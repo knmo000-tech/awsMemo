@@ -23,6 +23,7 @@
 | [ADR-0004](0004-no-customer-kms.md) | AWS KMS / DynamoDB / S3 | **専用のKMS顧客管理キーを追加採用しない**。標準暗号化を利用 | **不採用（現時点）** | KMSでは正規権限での請求データ改ざんを防げず、まず整合性・証跡・復旧を優先 |
 | [ADR-0005](0005-api-gateway-waf.md) | API Gateway HTTP/REST / WAF / CloudFront | REST API + WAFを採用、追加APIキー不要 | **採用** | 外部公開APIを守りつつ運用構成を簡素化 |
 | [ADR-0006](0006-audit-security.md) | CloudTrail / GuardDuty / CloudWatch / Secrets Manager / AWS Budgets | Secrets ManagerはJWT署名鍵管理として採用。他サービスは詳細設計中 | **一部採用・他は検討中** | AWS操作監査・脅威検出・顧客操作監査・秘密情報管理を分離 |
+| [ADR-0007](0007-output-json.md) | 生成物の形式 | JSONをS3に保存、ポーリングと非同期構成は維持 | **採用** | 成果物の要件がJSONに変更され、既存の非同期処理は維持するため |
 
 ## 決定の経緯
 
@@ -34,6 +35,8 @@
 | 2026-10-13 | 請求データの改ざん対策はKMSではなくIAM制限・追記型実績・監査・復旧が中心と整理。**KMS顧客管理キーを現時点で採用しないことを決定** |
 
 | 2026-10-13 | REST API + WAFの採用を確定。API Gatewayの追加APIキーは使わず、既存保守キー照合→JWT発行の認証方式を維持。自前JWTの署名鍵管理にSecrets Managerを採用 |
+
+| 2026-10-15 | 成果物をCSVからJSONへ変更。Lambda2関数、S3保存、ポーリングなど構成は維持（[ADR-0007](0007-output-json.md)） |
 
 ## 更新時のチェックリスト
 
