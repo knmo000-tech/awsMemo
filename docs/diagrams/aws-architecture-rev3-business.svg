@@ -79,12 +79,12 @@
 <text x="2332" y="777" font-family="Noto Sans CJK JP, sans-serif" font-size="21" fill="#244b6e" font-weight="700" text-anchor="start">Amazon S3</text>
 <text x="2267" y="821" font-family="Noto Sans CJK JP, sans-serif" font-size="16" fill="#244b6e" font-weight="400" text-anchor="start">生成CSVを非公開保存</text>
 <text x="2267" y="852" font-family="Noto Sans CJK JP, sans-serif" font-size="16" fill="#244b6e" font-weight="400" text-anchor="start">署名付きURLで取得</text>
-<rect x="293.5" y="303" width="103" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
+<rect x="313" y="303" width="64" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
 <text x="345" y="322" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">HTTPS</text>
 <rect x="1474.5" y="303" width="171" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
 <text x="1560" y="322" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">非同期Invoke</text>
-<rect x="1951" y="301" width="392" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
-<text x="2147" y="320" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">InvokeModel / 応答 usage</text>
+<rect x="2078" y="301" width="138" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
+<text x="2147" y="320" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">モデル呼出し</text>
 <rect x="1085" y="579" width="90" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
 <text x="1130" y="598" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">照合</text>
 <rect x="1328.5" y="606" width="103" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
@@ -93,8 +93,8 @@
 <text x="1592" y="550" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">状態更新</text>
 <rect x="1736" y="625" width="120" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
 <text x="1796" y="644" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">使用量記録案</text>
-<rect x="2023.5" y="755" width="273" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
-<text x="2160" y="774" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">CSV保存 PutObject</text>
+<rect x="2110" y="755" width="100" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
+<text x="2160" y="774" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">CSV保存</text>
 <rect x="1901.5" y="172" width="137" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
 <text x="1970" y="191" font-family="Noto Sans CJK JP, sans-serif" font-size="15" fill="#395e7e" font-weight="500" text-anchor="middle">署名URL生成</text>
 <rect x="786.5" y="512" width="137" height="28" rx="7" fill="white" stroke="#d1e0ec"/>
