@@ -9,7 +9,7 @@ API Gateway REST API + AWS WAFを推奨案とする（API Gateway種類は検討
 | --- | --- | --- | --- |
 | POST | `/auth` | 200 | 保守キー・顧客名照合、トークン発行 |
 | POST | `/jobs` | 202 | ジョブ登録、Worker非同期起動 |
-| GET | `/jobs/{jobId}` | 200 | 状態取得、完了時にCSVダウンロードURL発行 |
+| GET | `/jobs/{jobId}` | 200 | 状態取得、完了時にJSONダウンロードURL発行 |
 
 ## POST /auth
 
@@ -23,11 +23,14 @@ Response 200:
 ```
 エラー: 400 `VALIDATION_ERROR`、401 `INVALID_CREDENTIALS`、429 `RATE_LIMITED`、500 `INTERNAL_ERROR`。
 
+
+> **2026-10-15：生成物をJSONに変更。** `POST /jobs` は非同期受付（202）、`GET /jobs/{jobId}` は引き続きポーリングで状態／署名付きURLを返す。S3に保存するファイルは `result.json`（`application/json`）を想定。
+
 ## POST /jobs
 
 Request:
 ```json
-{"inputText":"CSV化したい文章","outputFormat":"csv"}
+{"inputText":"JSON生成に用いる文章","outputFormat":"json"}
 ```
 Response 202:
 ```json
@@ -43,11 +46,11 @@ Response 200（処理中）:
 ```
 Response 200（成功）:
 ```json
-{"jobId":"c7c5c92c-0d66-4d7d-8409-9dd6a1c4c8f1","status":"SUCCEEDED","result":{"fileName":"result.csv","downloadUrl":"https://example.invalid/presigned-url","urlExpiresIn":300}}
+{"jobId":"c7c5c92c-0d66-4d7d-8409-9dd6a1c4c8f1","status":"SUCCEEDED","result":{"fileName":"result.json","contentType":"application/json","downloadUrl":"https://example.invalid/presigned-url","urlExpiresIn":300}}
 ```
 Response 200（失敗）:
 ```json
-{"jobId":"c7c5c92c-0d66-4d7d-8409-9dd6a1c4c8f1","status":"FAILED","error":{"code":"GENERATION_FAILED","message":"CSV生成に失敗しました"}}
+{"jobId":"c7c5c92c-0d66-4d7d-8409-9dd6a1c4c8f1","status":"FAILED","error":{"code":"GENERATION_FAILED","message":"JSON生成に失敗しました"}}
 ```
 エラー: 400 `VALIDATION_ERROR`、401 `UNAUTHORIZED`、404 `JOB_NOT_FOUND`（別顧客ジョブを含む）、429 `RATE_LIMITED`、500 `INTERNAL_ERROR`。
 
@@ -61,7 +64,7 @@ Response 200（失敗）:
 - JWT等のトークン署名と有効期限検証、顧客単位のジョブ認可。キーや秘密情報をログに出さない。
 - ジョブの冪等性、非同期起動失敗への補償、Workerの再試行と状態整合性。
 - API Gatewayのエラーも共通形式に寄せる場合は追加設定が必要。
-- ポーリング間隔、入力長、タイムアウト、CSV形式、ダウンロードURL期限は要確定。
+- ポーリング間隔、入力長、タイムアウト、JSON形式、ダウンロードURL期限は要確定。
 
 関連: [構成設計](architecture.md) / [シーケンス](sequence.md)
 
