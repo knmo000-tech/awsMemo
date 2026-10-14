@@ -2,7 +2,7 @@
 
 WPF（.NET Framework 4.8）から AWS の Amazon Bedrock を利用してJSONを生成する非同期APIの設計メモです。
 
-## 現在の設計方針（2026-10-13）
+## 現在の設計方針（2026-10-15）
 
 - API Gateway経由で **API Lambda 1つ（Python / FastAPI + Mangum）** を利用する。
 - 公開エンドポイント: `POST /auth`、`POST /jobs`、`GET /jobs/{jobId}`。
@@ -30,7 +30,9 @@ WPF（.NET Framework 4.8）から AWS の Amazon Bedrock を利用してJSONを�
 
 **注:** rev4は`docs/architecture.md`と照合して更新した「推奨採用するサービスを含む構成案」でありAWS環境への設定完了を意味しません。専用KMS顧客管理キーは不採用、UsageEventsの物理別テーブル化は検討中です。
 
-## デザインレビュー資料（草稿 v0.2）
+## デザインレビュー資料（草稿 v0.2・JSON変更前）
+
+> このレビュー資料は出力形式がCSVだった時点のスナップショットです。現行仕様は[構成設計](docs/architecture.md)、[API仕様](docs/api-spec.md)、[ADR-0007](docs/adr/0007-output-json.md)を参照してください。
 
 - **[レビュー用Markdown](docs/reviews/aws-design-review-v0.2.md)** — 上司への説明に使う構成比較、採用／不採用理由、残存リスク、想定Q&A
 - [レイアウト付きHTML](docs/reviews/aws-design-review-v0.2.html) — ダウンロードしてブラウザで閲覧する版
