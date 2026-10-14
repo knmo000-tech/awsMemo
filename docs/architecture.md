@@ -8,6 +8,13 @@ WPF（.NET Framework 4.8）から HTTPS で API Gateway を通じて、**FastAPI
 
 ### セキュリティ追加後の構成（REST API + WAF採用）
 
+**最新の編集可能な構成図（rev3）**
+- [draw.io構成図（業務処理・セキュリティ監査の2ページ）](diagrams/aws-architecture-rev3.drawio)
+- [業務処理・データフロー（SVG）](diagrams/aws-architecture-rev3-business.svg)
+- [セキュリティ・監査（SVG）](diagrams/aws-architecture-rev3-security.svg)
+
+図では見やすさのためDynamoDBアイコンを1つとし、その内部にCustomers / Jobs / UsageEvents（案）を並べている。**UsageEventsの別テーブル採用はまだ確定していない。** 監査・ログ・通知の線は独立ページに分離した。
+
 ```mermaid
 flowchart TD
     C["WPFクライアント"] -->|"HTTPS"| WF["AWS WAF<br/>マネージドルール・レート制限"]
