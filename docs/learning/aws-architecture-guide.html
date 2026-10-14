@@ -1,0 +1,503 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AWS構成を自分の言葉で説明するための理解ノート</title><style>
+:root{--paper:#fff;--ink:#183247;--muted:#64798b;--border:#d9e4ed;--bg:#edf3f7;--soft:#f5f9fc;--accent:#146786;--accent2:#066a68;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans CJK JP","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-size:15px;line-height:1.8}
+a{color:#106388;text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:255px minmax(0,1fr);gap:18px;padding:20px}
+.left{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;border:1px solid var(--border);background:var(--paper);border-radius:14px;padding:15px}
+.left h3{margin:2px 0 8px;font-size:13px;letter-spacing:.08em;color:#44697c}
+.left a{display:block;color:#42596b;line-height:1.6;font-size:13px;padding:6px 8px;border-radius:6px}.left a:hover{background:#eff7fb;text-decoration:none}
+.paper{min-width:0;background:#fff;border:1px solid var(--border);border-radius:15px;box-shadow:0 4px 20px #1d44620c;overflow:hidden}
+.hero{background:linear-gradient(120deg,#183f59,#0e6880);padding:44px 46px;color:white}
+.hero .eyebrow{color:#c0ebf2;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:700}
+.hero h1{font-size:31px;line-height:1.45;letter-spacing:-.02em;margin:13px 0 13px}
+.hero p{margin:0;opacity:.9;max-width:730px}
+.chapters{padding:31px 45px 42px}
+.chapters>blockquote:first-of-type{background:#f1f8fa;border-left:4px solid #278cb0}
+h2{font-size:22px;line-height:1.45;margin:46px 0 16px;padding:0 0 10px;border-bottom:2px solid #d9e8f1;color:#143e59;break-after:avoid;scroll-margin-top:25px}
+h3{font-size:17px;line-height:1.5;color:#135c75;margin:24px 0 8px;break-after:avoid}
+p{margin:11px 0}strong{color:#0b506a}
+blockquote{margin:18px 0;padding:12px 18px;background:#f1f7fa;border-left:4px solid #4a94ae;border-radius:0 7px 7px 0}
+blockquote p{margin:4px 0}
+hr{border:0;border-top:1px solid #dfebf2;margin:35px 0 20px}
+ul,ol{padding-left:24px;margin:10px 0}li{padding-left:3px;margin:5px 0}li::marker{color:#317d9a}
+.tablewrap{overflow:auto;max-width:100%;margin:16px 0;border:1px solid #dde7ee;border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13.4px;line-height:1.6}
+th{background:#eaf2f7;color:#24465d;font-weight:700;text-align:left;white-space:normal}
+th,td{border-bottom:1px solid #e2eaf1;padding:10px 12px;vertical-align:top}tbody tr:nth-child(even){background:#fcfdfe}tbody tr:last-child td{border-bottom:0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;background:#eef4f7;color:#0d566d;font-size:.91em;padding:2px 4px;border-radius:4px}
+pre{background:#182c3e;color:#eff6fa;border-radius:10px;overflow-x:auto;padding:14px 17px;line-height:1.65;font-size:12.4px;margin:17px 0}
+pre code{background:transparent;color:inherit;padding:0;font-size:inherit;white-space:pre}
+.flowdiagram{border:1px solid #cbdde7;background:linear-gradient(180deg,#f7fbfe,#edf5f9);border-radius:13px;padding:20px 15px 12px;margin:18px 0}
+.flowline{display:flex;align-items:center;justify-content:center;gap:6px}.flowbox{flex:1;min-width:0;border:1px solid #8fb3c5;background:white;border-radius:9px;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:9px 8px;line-height:1.3;box-shadow:0 2px 4px #1a47540b}
+.flowbox b{font-size:12.9px}.flowbox small{color:#596d7c;font-size:11.5px;margin-top:7px}.flowbox.client{background:#eaf1f9}.flowbox.gate{background:#fff3df}.flowbox.api,.flowbox.worker{background:#e8f5fa}.flowbox.bedrock{background:#eff0fa}
+.flowarrow{color:#2d7894;font-size:21px;font-weight:700;flex:none}
+.flowstorage{display:flex;justify-content:center;align-items:center;gap:22px;margin:18px 0 0}.flowstorage .flowbox{flex:none;width:34%;min-height:69px}.flowbox.db{background:#e9f4fa}.flowbox.s3{background:#e8f8f2}.flowdown{color:#43869d;font-size:24px}
+.flowcaption{color:#536f82;text-align:center;font-size:12px;margin:12px 0 0}
+.mobiletoc{display:none}footer{text-align:center;padding:10px 0 38px;font-size:12px;color:#698497}
+@media(max-width:900px){.wrap{display:block;padding:0}.left{display:none}.paper{border:0;border-radius:0;box-shadow:none}.hero{padding:31px 25px}.hero h1{font-size:25px}.chapters{padding:17px 23px 35px}.mobiletoc{display:block;margin:13px 0 10px}.mobiletoc summary{font-weight:700;color:#1f6179;padding:7px 12px;border:1px solid #d6e4ec;border-radius:7px}.mobiletoc nav{display:flex;flex-direction:column;padding:10px;border:1px solid #d6e4ec;border-top:0}.mobiletoc nav a{padding:5px 0;font-size:13px}h2{font-size:20px;margin-top:40px}}
+@media(max-width:540px){body{font-size:14px}.hero h1{font-size:23px}.hero{padding:24px 19px}.chapters{padding:14px 18px 30px}h2{font-size:19px}.flowline{flex-wrap:wrap}.flowbox{flex:1 1 32%;min-height:65px}.flowarrow{font-size:17px}.flowstorage{gap:8px}.flowstorage .flowbox{width:42%}.flowdown{display:none}table{font-size:12.6px}th,td{padding:8px 9px}pre{font-size:11px;white-space:pre-wrap;overflow-wrap:anywhere}pre code{white-space:pre-wrap}}
+@page{size:A4;margin:16mm 15mm 15mm 15mm;@bottom-right{content:counter(page) " / " counter(pages);font:9px "Noto Sans CJK JP";color:#70879a}}
+@media print{
+ html{scroll-behavior:auto}body{background:white;font-size:13px;line-height:1.72;color:#183247}
+ .wrap{display:block;padding:0;max-width:none}.left,.mobiletoc{display:none}.paper{border:0;border-radius:0;box-shadow:none;overflow:visible}.hero{background:#eff6fa;color:#1e4f68;padding:16px 18px;break-after:avoid;border-radius:9px}
+ .hero .eyebrow{color:#3c7e99}.hero h1{font-size:22px;margin:7px 0}.hero p{font-size:11px}
+ .chapters{padding:8px 0}.chapters h2{font-size:17px;margin:21px 0 9px;break-after:avoid}.chapters h3{font-size:14px;margin:15px 0 6px;break-after:avoid}
+ .chapters p{margin:6px 0}table{font-size:10.5px;line-height:1.5}th,td{padding:5px 7px}
+ .tablewrap{overflow:visible;margin:8px 0}pre{font-size:10px;margin:9px 0;padding:9px;white-space:pre-wrap;overflow-wrap:anywhere}pre code{white-space:pre-wrap}
+ blockquote{margin:10px 0;padding:7px 12px}li{margin:3px 0}ul,ol{margin:5px 0}
+ a{color:#166080}a[href^="http"]{text-decoration:none}
+ .flowdiagram{padding:10px 9px 5px;margin:10px 0;break-inside:avoid}.flowbox{min-height:62px}.flowbox b{font-size:10px}.flowbox small{font-size:8.5px;margin-top:4px}.flowstorage .flowbox{min-height:46px}.flowcaption{font-size:9px}
+ footer{display:none}
+}
+</style></head><body>
+<div class="wrap"><aside class="left"><h3>CHAPTERS</h3><a href="#ch-1">1. 最初に押さえる「登場人物の役割」</a>
+<a href="#ch-2">2. 1回の処理を頭の中で追う</a>
+<a href="#ch-3">3. 深掘り：DynamoDBとS3は何が違う？</a>
+<a href="#ch-4">4. Lambdaは結局どんなサービス？ なぜ2個？</a>
+<a href="#ch-5">5. API GatewayとWAFは何が違う？</a>
+<a href="#ch-6">6. BedrockはChatGPTやLambdaと何が違う？</a>
+<a href="#ch-7">7. Secrets Manager・JWT・IAMはどこが違う？</a>
+<a href="#ch-8">8. CloudWatch、CloudTrail、GuardDutyは似ているけど別物</a>
+<a href="#ch-9">9. KMSを採用しない、というのは「暗号化しない」の意味？</a>
+<a href="#ch-10">10. 請求まわりで本当に難しいところ</a>
+<a href="#ch-11">11. 上司に聞かれそうな質問と、説明の骨子</a>
+<a href="#ch-12">12. 口頭で話す練習（長さ別）</a>
+<a href="#ch-13">13. セルフチェック（答えを隠して考える）</a></aside><main class="paper"><header class="hero"><div class="eyebrow">AWS Architecture · Personal Study Notes</div><h1>AWS構成を自分の言葉で<br>説明するための理解ノート</h1><p>それぞれのサービスは何なのか。なぜ必要なのか。図を見ながら、自分の言葉で答えられるようになるための資料。</p></header><div class="chapters"><details class="mobiletoc"><summary>目次を開く</summary><nav><a href="#ch-1">1. 最初に押さえる「登場人物の役割」</a>
+<a href="#ch-2">2. 1回の処理を頭の中で追う</a>
+<a href="#ch-3">3. 深掘り：DynamoDBとS3は何が違う？</a>
+<a href="#ch-4">4. Lambdaは結局どんなサービス？ なぜ2個？</a>
+<a href="#ch-5">5. API GatewayとWAFは何が違う？</a>
+<a href="#ch-6">6. BedrockはChatGPTやLambdaと何が違う？</a>
+<a href="#ch-7">7. Secrets Manager・JWT・IAMはどこが違う？</a>
+<a href="#ch-8">8. CloudWatch、CloudTrail、GuardDutyは似ているけど別物</a>
+<a href="#ch-9">9. KMSを採用しない、というのは「暗号化しない」の意味？</a>
+<a href="#ch-10">10. 請求まわりで本当に難しいところ</a>
+<a href="#ch-11">11. 上司に聞かれそうな質問と、説明の骨子</a>
+<a href="#ch-12">12. 口頭で話す練習（長さ別）</a>
+<a href="#ch-13">13. セルフチェック（答えを隠して考える）</a></nav></details><blockquote>
+<p>読み方：最初は「全体像 → 1回の処理 → DBとS3」を読めば十分。その後、各サービスの役割と想定質問を確認する。</p>
+</blockquote>
+<p>今回のシステムは、<strong>複数の顧客企業が利用するWPFデスクトップアプリからAmazon BedrockでJSONを生成するサービス</strong>。API受付とAI実行を分離し、顧客認証・ジョブ管理・利用量に基づく請求・監査まで考慮する。</p>
+<p>GitHubの図と併せて読む：<a href="https://github.com/knmo000-tech/awsMemo/blob/main/docs/architecture.md">全体アーキテクチャ</a> ／ <a href="https://github.com/knmo000-tech/awsMemo/blob/main/docs/diagrams/aws-architecture-rev4-business.svg">業務構成図</a> ／ <a href="https://github.com/knmo000-tech/awsMemo/blob/main/docs/diagrams/aws-architecture-rev4-security.svg">セキュリティ・監査図</a></p>
+<h2 id="ch-1">1. 最初に押さえる「登場人物の役割」</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+  <th>役割</th>
+  <th>サービス</th>
+  <th>何をしている？</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>顧客の画面</td>
+  <td><strong>WPF</strong></td>
+  <td>ログイン、生成依頼、進行状況の確認、JSON取得</td>
+</tr>
+<tr>
+  <td>門番</td>
+  <td><strong>AWS WAF</strong></td>
+  <td>明らかに怪しいHTTPリクエストや過剰アクセスを制限</td>
+</tr>
+<tr>
+  <td>受付窓口</td>
+  <td><strong>API Gateway REST API</strong></td>
+  <td>インターネットからのHTTPSリクエストをAPI Lambdaへ渡す</td>
+</tr>
+<tr>
+  <td>受付係</td>
+  <td><strong>API Lambda（FastAPI）</strong></td>
+  <td>認証、ジョブ受付、状況照会、ダウンロード許可</td>
+</tr>
+<tr>
+  <td>作業担当</td>
+  <td><strong>Worker Lambda</strong></td>
+  <td>Bedrockを呼び出し、JSON保存・ジョブ状態更新・使用量記録</td>
+</tr>
+<tr>
+  <td>AIエンジン</td>
+  <td><strong>Amazon Bedrock</strong></td>
+  <td>モデルを実行して生成結果と取得可能な利用量情報を返す</td>
+</tr>
+<tr>
+  <td>管理台帳</td>
+  <td><strong>DynamoDB</strong></td>
+  <td>顧客情報、ジョブの状態、請求用の使用量データ</td>
+</tr>
+<tr>
+  <td>ファイル保管庫</td>
+  <td><strong>Amazon S3</strong></td>
+  <td>生成したJSONファイル本体を保存し、顧客へ配信</td>
+</tr>
+<tr>
+  <td>金庫</td>
+  <td><strong>Secrets Manager</strong></td>
+  <td>JWT署名に使う秘密鍵を管理</td>
+</tr>
+<tr>
+  <td>監視・監査</td>
+  <td><strong>CloudWatch / CloudTrail / GuardDuty</strong></td>
+  <td>障害・利用操作・AWS操作・不審な活動を把握</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>この構成の肝：</strong> HTTPリクエストへの応答はAPI Lambdaで素早く返し、時間のかかるAI生成をWorker Lambdaに任せる。その間の状態はDynamoDB、完成した成果物はS3に置く。</p>
+<h2 id="ch-2">2. 1回の処理を頭の中で追う</h2>
+<div class="flowdiagram" role="img" aria-label="WPFからWAF・API Gateway、API Lambda、Worker Lambda、Bedrockへ。DynamoDBが状態を管理し、S3がJSONを保存する構成">
+ <div class="flowline">
+   <div class="flowbox client"><b>WPF</b><small>顧客PC</small></div><span class="flowarrow">→</span>
+   <div class="flowbox gate"><b>WAF / API Gateway</b><small>守る・受け付ける</small></div><span class="flowarrow">→</span>
+   <div class="flowbox api"><b>API Lambda</b><small>認証・受付・照会</small></div><span class="flowarrow">→</span>
+   <div class="flowbox worker"><b>Worker Lambda</b><small>非同期で実行</small></div><span class="flowarrow">⇄</span>
+   <div class="flowbox bedrock"><b>Bedrock</b><small>AIによる生成</small></div>
+ </div>
+ <div class="flowstorage"><span class="flowdown">↘</span>
+  <div class="flowbox db"><b>DynamoDB</b><small>顧客・ジョブ・使用量を管理</small></div>
+  <div class="flowbox s3"><b>S3</b><small>生成JSON本体を保存</small></div>
+  <span class="flowdown">↙</span></div>
+ <p class="flowcaption">ジョブ状況はDynamoDBを照会 ／ 完了時はS3からJSONを直接取得</p>
+</div>
+<h3>ステップA：認証（POST /auth）</h3>
+<ol>
+<li>WPFが、顧客名と既存の<strong>保守キー</strong>をHTTPSで送る。</li>
+<li>WAFがリクエストを検査し、API GatewayがAPI Lambdaへ転送。</li>
+<li>API LambdaのFastAPIがDynamoDBの<code>Customers</code>を照合。</li>
+<li>合致したら、JWTを発行してWPFに返す。JWTの署名鍵はSecrets Managerから取得する。</li>
+</ol>
+<p><strong>覚えること：</strong> 保守キーは最初の身元確認材料。JWTは、その後のAPI呼び出しで使う期限付きの認証トークン。API Gatewayの「APIキー」という別機能は使わない。</p>
+<h3>補足：JWTは毎回発行するの？</h3>
+<p><strong>いいえ。有効期限内のJWTはWPF側で保持し、次回の生成AI利用でも再利用する。</strong> Lambda側がJWTを保持して返し直す仕組みではない。<code>POST /auth</code>はJWTの新規取得・再認証のためのAPI。</p>
+<p>例えばJWTの有効期間を<strong>1時間と仮定</strong>すると、次の動きになる。</p>
+<table>
+<thead>
+<tr>
+<th>時刻</th>
+<th>利用者の操作</th>
+<th>WPFがすること</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10:00</td>
+<td>1回目の生成AI利用</td>
+<td><code>POST /auth</code>でJWT取得（11:00まで有効）。取得したJWTで<code>POST /jobs</code></td>
+</tr>
+<tr>
+<td>10:05</td>
+<td>1回目が完了</td>
+<td>JSON取得。<strong>JWTはWPFのメモリに保持</strong></td>
+</tr>
+<tr>
+<td>10:30</td>
+<td>2回目の生成AI利用</td>
+<td><strong><code>POST /auth</code>は呼ばず</strong>、同じJWTで直接<code>POST /jobs</code></td>
+</tr>
+<tr>
+<td>11:00以降</td>
+<td>さらに利用</td>
+<td>JWTが期限切れなら、<code>POST /auth</code>で新しいJWTを取得してから利用</td>
+</tr>
+</tbody>
+</table>
+<p>WPFは<code>Authorization: Bearer &lt;JWT&gt;</code>を<code>POST /jobs</code>や<code>GET /jobs/{jobId}</code>に付ける。<strong>API LambdaはリクエストごとにJWTの署名と期限を検証するが、通常は保守キーを毎回照合しない。</strong></p>
+<p>WPFの実装ではJWTと期限をメモリで管理し、期限の少し前に再認証する。<code>401</code>を受けた場合の再認証も扱う。ただし<strong>失敗したジョブ投入の無条件な再送は、二重登録・二重課金に注意</strong>する。WPFを再起動してメモリ上のJWTが消えた場合も再認証する。</p>
+<p><strong>設計上の注意：</strong> 上記の1時間は説明用の仮定。API仕様の<code>expiresIn: 900</code>は15分の例で、正式なJWT有効期限は未決定。また、JWTが有効期間内でも顧客停止を即時反映したい場合は別の失効確認が必要になる。</p>
+<h3>ステップB：生成依頼（POST /jobs）</h3>
+<ol>
+<li>WPFがJWTと生成したいテキストを送る。</li>
+<li>API LambdaがJWTを検証し、DynamoDBの<code>Jobs</code>に<code>QUEUED</code>を記録。</li>
+<li>API LambdaがWorker Lambdaを<strong>非同期で起動</strong>。</li>
+<li>WPFには生成完了を待たず、<code>202 Accepted</code>と<code>jobId</code>を返す。</li>
+</ol>
+<p><strong>覚えること：</strong> 202は「処理の受付」であり「AI生成の成功」ではない。</p>
+<h3>ステップC：AI処理（Worker）</h3>
+<ol>
+<li>Workerは<code>RUNNING</code>を記録し、Bedrockにモデル実行を依頼。</li>
+<li>Bedrockの応答から生成内容と、モデル/APIで取得できる入力・出力トークン使用量を得る。</li>
+<li>WorkerはJSONを検証・整形し、S3に<code>application/json</code>で保存。</li>
+<li>併せて利用量をサーバー側で記録し、ジョブの状態を<code>SUCCEEDED</code>または<code>FAILED</code>に更新。</li>
+</ol>
+<p><strong>覚えること：</strong> トークン使用量は顧客のPCに申告させない。正確な請求のため、AWS側で得た情報を保存する。</p>
+<h3>ステップD：完了確認とダウンロード（GET /jobs/{jobId}）</h3>
+<ol>
+<li>WPFは定期的にジョブを照会する（<strong>ポーリング</strong>）。</li>
+<li>API LambdaがJWT・ジョブの顧客所有者・状態を確認する。</li>
+<li>成功済みなら、S3の<strong>署名付きURL</strong>を短時間だけ有効にして返す。</li>
+<li>WPFはそのURLへHTTPS GETし、<strong>API Lambdaを通さずS3からJSONを取得</strong>する。</li>
+</ol>
+<p><strong>覚えること：</strong> Lambdaを通さないのは<em>ファイル本体の転送だけ</em>。ダウンロードしてよいかの判定はAPI Lambdaが実施する。</p>
+<hr />
+<h2 id="ch-3">3. 深掘り：DynamoDBとS3は何が違う？</h2>
+<p>この質問には、次のように説明できる。</p>
+<blockquote>
+<p>「DynamoDBは処理の管理台帳、S3は生成ファイルの保管庫です。ジョブIDで状況を素早く調べたいデータはDynamoDBに置き、約1MBになるJSON本体はS3に保存します。DynamoDBには、そのJSONがS3のどこにあるかを記録します。」</p>
+</blockquote>
+<h3>DynamoDBとは</h3>
+<p>AWSが運用する<strong>NoSQLデータベース</strong>。テーブル内のアイテム（レコード）をキーで素早く検索・更新するのが得意。OS・DBサーバーを自分たちで管理する必要がない。今回の「ジョブIDを指定して状態を取得」に合う。</p>
+<ul>
+<li><code>Customers</code>：顧客ID、会社名、保守キーの検証材料、有効/無効など。</li>
+<li><code>Jobs</code>：jobId、customerId、<code>QUEUED/RUNNING/SUCCEEDED/FAILED</code>、S3オブジェクトキー、エラーコードなど。</li>
+<li><code>UsageEvents</code>（<strong>保存方式は検討中</strong>）：モデル・顧客・jobIdごとの実トークン使用量と課金計算の証拠。</li>
+</ul>
+<p><strong>注意：DynamoDBの1アイテムは最大400KB。</strong> 今回の生成JSONは最大約1MBの想定なので、結果の全体を1アイテムに入れることはできない。</p>
+<h3>S3とは</h3>
+<p>AWSの<strong>オブジェクトストレージ</strong>。バケット（保管場所）の中へ、キー（ファイルの識別名）を指定してJSON・画像・ログなどのオブジェクトを保存する。ファイル保存・再取得・ダウンロード配信に向く。</p>
+<p>例えば、次のイメージ。</p>
+<pre><code class="language-text">S3 バケット: ai-results-private
+オブジェクトキー: customers/customer-001/jobs/job-123/result.json
+ファイル内容: { &quot;summary&quot;: &quot;...&quot;, &quot;items&quot;: [...] }
+Content-Type: application/json
+</code></pre>
+<p>DynamoDBの<code>Jobs</code>に入るのは次のようなデータ（概念例）。</p>
+<pre><code class="language-json">{
+  &quot;jobId&quot;: &quot;job-123&quot;,
+  &quot;customerId&quot;: &quot;customer-001&quot;,
+  &quot;status&quot;: &quot;SUCCEEDED&quot;,
+  &quot;resultS3Key&quot;: &quot;customers/customer-001/jobs/job-123/result.json&quot;
+}
+</code></pre>
+<p><strong>結果本体のJSONはS3</strong>、<strong>その所在と状態はDynamoDB</strong>。バケット名・キー名は設計例であり、まだ確定した命名ではない。</p>
+<h3>「S3を使わずに全部DBにできないの？」</h3>
+<p>小さいJSONなら別設計も可能。ただし今回は約1MBの可能性があり、DynamoDBの400KB上限を超える。また、ジョブ管理とファイル配信は特性が違う。S3に分けることで、大きめの生成物の保存・保持期限の設定・直接ダウンロードが扱いやすい。</p>
+<h3>「S3が非公開なのにWPFがダウンロードできるの？」</h3>
+<p>S3の<strong>署名付きURL</strong>を使う。API LambdaはJWTと所有者を確認したあと、自身のIAM権限で期限付きのURLを生成する。S3はその署名を検証して、一時的に特定オブジェクトの取得を許可する。</p>
+<p>署名付きURLは有効期限中、URLを知っている人が使える<strong>一時的な鍵のようなもの</strong>。秘密情報として扱い、ログに残さない。発行済みURLはJWT失効と自動連動しない点にも注意。</p>
+<hr />
+<h2 id="ch-4">4. Lambdaは結局どんなサービス？ なぜ2個？</h2>
+<h3>AWS Lambdaとは</h3>
+<p><strong>必要なときだけプログラムを実行するサービス（サーバーレスの計算処理）</strong>。EC2のように自分たちで常駐サーバーを起動・パッチ適用する必要がない。関数ごとにコード・実行ロール・タイムアウト等を設定する。</p>
+<h3>API Lambda：受付に専念</h3>
+<p>Pythonの<strong>FastAPI</strong>というWebフレームワークで3つのAPIを実装する。</p>
+<ul>
+<li><code>POST /auth</code>：顧客認証とJWT発行。</li>
+<li><code>POST /jobs</code>：ジョブ登録とWorkerの非同期起動。</li>
+<li><code>GET /jobs/{jobId}</code>：ジョブ照会と署名付きURLの発行。</li>
+</ul>
+<p><strong>Mangum</strong>はAPI GatewayからLambdaへ渡されるイベントを、FastAPIが理解するASGIリクエストへ変換するアダプター。<strong>FastAPIはAWSサービス名ではなく、Pythonのライブラリ</strong>。MangumもAWSサービスではなくライブラリ。</p>
+<h3>Worker Lambda：重い処理に専念</h3>
+<p>Bedrock呼び出し、JSON検証、S3への書き込み、DynamoDBの状態・使用量記録を担当。外部から直接呼び出す公開HTTPエンドポイントは設けない。</p>
+<p><strong>なぜ分ける？</strong> Bedrockの処理完了までHTTP接続を維持しなくて済み、API側とWorker側でタイムアウト・権限・障害対応を分けられるから。特にAPI LambdaにBedrock実行権限を付けなくてよい。</p>
+<h3>非同期とポーリングの違い</h3>
+<ul>
+<li><strong>非同期実行</strong>：API LambdaはWorkerの完了を待たずに受付結果を返すこと。</li>
+<li><strong>ポーリング</strong>：WPFが「終わった？」と一定間隔でAPIへ確認すること。</li>
+</ul>
+<p>両者は対応している。処理が非同期だからこそ、別の方法で完了を確かめる必要がある。今回はポーリング＋DynamoDBの状態管理を採用している。</p>
+<h3>「1MBなら同期処理にできるのでは？」</h3>
+<p><strong>ファイルサイズと生成所要時間は別の問題。</strong> JSONが1MBでも生成に数十秒以上かかる場合がある。同期化にはAPIタイムアウト・失敗時の再試行・通信断などの設計変更が伴うため、今回は非同期構成を維持する。</p>
+<hr />
+<h2 id="ch-5">5. API GatewayとWAFは何が違う？</h2>
+<h3>Amazon API Gateway</h3>
+<p>外部向けHTTPS APIの<strong>入口・転送窓口</strong>。URL、HTTPメソッド、Lambdaとの統合、スロットリング、アクセスログなどを扱う。今回のRegional <strong>REST API</strong>では、<code>ANY /{proxy+}</code> でAPI Lambdaへまとめて転送し、<strong>実際の<code>/auth</code>や<code>/jobs</code>のルーティングはFastAPI側</strong>で行える。</p>
+<p><strong>API Gatewayの「APIキー」と既存の「保守キー」は別物。</strong> API Gateway独自のAPIキーは使わず、顧客が持っている保守キーをアプリ側で検証する。</p>
+<h3>AWS WAF</h3>
+<p>Web Application Firewall。APIに届くHTTPリクエストを検査し、攻撃パターンや過剰なリクエストを制限する。<strong>REST APIステージにWeb ACLを関連付ける</strong>。構成図では入口の手前に描くが、独立した中継サーバーを起動するイメージではない。</p>
+<p><strong>WAFは認証の代わりにはならない。</strong> WAFが許可したリクエストでも、FastAPIはJWTやジョブの所有者を確認する。</p>
+<h3>2つをどう説明する？</h3>
+<p>「WAFが入口で不審なアクセスを選別し、API GatewayがHTTPリクエストをLambdaへ渡します。APIの業務的な認証・認可はFastAPIが行います。」</p>
+<hr />
+<h2 id="ch-6">6. BedrockはChatGPTやLambdaと何が違う？</h2>
+<p><strong>Amazon Bedrock</strong>は、AWSから基盤モデルをAPIで利用するためのマネージドサービス。自分たちでGPUサーバーやモデルの配備を運用せず、許可したモデルに入力を送って推論結果を得る。</p>
+<ul>
+<li>Lambda：<strong>業務プログラムを実行する側</strong>。入力を組み立て、Bedrockを呼び、結果を保存する。</li>
+<li>Bedrock：<strong>モデルを実行する側</strong>。入力からテキストなどを生成する。</li>
+<li>S3：<strong>生成結果を保管する側</strong>。Bedrockの代わりにAIを動かすものではない。</li>
+</ul>
+<p>生成したテキストが常に正しいJSONとは限らない。Worker側でパース・スキーマ検証・エラー処理を行う設計が必要。出力形式はJSON、生成物の最大サイズは約1MBの想定。</p>
+<p><strong>請求に重要な点：</strong> Bedrockの利用料金と、顧客に自社料金で請求する金額は同じとは限らない。入力・出力トークン等の実績をサーバー側で記録して、自社の料金計算に使う。</p>
+<hr />
+<h2 id="ch-7">7. Secrets Manager・JWT・IAMはどこが違う？</h2>
+<p>混同しがちだが、扱う「相手」が違う。</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+  <th>用語</th>
+  <th>何か</th>
+  <th>今回の役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>保守キー</td>
+  <td>既存顧客を確認するための材料</td>
+  <td>最初の<code>/auth</code>で照合</td>
+</tr>
+<tr>
+  <td>JWT</td>
+  <td>署名付きの期限付きトークン</td>
+  <td>WPFから<code>/jobs</code>等を使うときの認証情報</td>
+</tr>
+<tr>
+  <td>Secrets Manager</td>
+  <td>秘密情報を管理するAWSサービス</td>
+  <td>JWTの署名鍵を安全に保管</td>
+</tr>
+<tr>
+  <td>IAM</td>
+  <td>AWSリソースを操作できる主体と権限を決める仕組み</td>
+  <td>API Lambdaは顧客DB/ジョブ参照、WorkerはBedrock/S3書込等に限定</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>JWTの認証は「顧客が誰か」</strong>、<strong>IAMは「そのLambdaがAWS上で何をできるか」</strong>。JWTがあるだけではS3やBedrockを操作できない。逆にLambdaにIAM権限があっても、顧客のジョブ所有者チェックを省略してはいけない。</p>
+<p>例：API Lambdaは署名URL生成に必要なS3取得権限を持つが、Worker LambdaはS3へJSONを書き込む権限を持つ。役割によって権限を分ける。</p>
+<hr />
+<h2 id="ch-8">8. CloudWatch、CloudTrail、GuardDutyは似ているけど別物</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+  <th>サービス</th>
+  <th>どんなもの？</th>
+  <th>今回知りたいことの例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>CloudWatch</strong></td>
+  <td>ログ・メトリクス・アラーム</td>
+  <td><code>POST /jobs</code>が何件失敗した？ Workerがタイムアウトした？</td>
+</tr>
+<tr>
+  <td><strong>CloudTrail</strong></td>
+  <td>AWS API操作の監査記録</td>
+  <td>誰のAWS権限で設定を変更した？ S3やDynamoDBにどのようなAPI操作があった？</td>
+</tr>
+<tr>
+  <td><strong>GuardDuty</strong></td>
+  <td>AWS環境での不審な活動の検知</td>
+  <td>認証情報の悪用や異常なアクセスの兆候がある？</td>
+</tr>
+<tr>
+  <td><strong>EventBridge</strong></td>
+  <td>イベントを条件で振り分けるサービス</td>
+  <td>GuardDutyの検知結果を通知処理へ渡す</td>
+</tr>
+<tr>
+  <td><strong>Amazon SNS</strong></td>
+  <td>通知を配信するサービス</td>
+  <td>異常検知をメール等で運用担当者へ送る</td>
+</tr>
+<tr>
+  <td><strong>AWS Budgets</strong></td>
+  <td>AWS費用の予算管理・通知</td>
+  <td>Bedrockや関連AWS料金が想定を超えそうか？</td>
+</tr>
+</tbody>
+</table></div>
+<h3>CloudWatch vs CloudTrail</h3>
+<p>CloudWatchは主に<strong>アプリがどう動いたか</strong>。CloudTrailは主に<strong>AWS上でどんなAPI操作が行われたか</strong>。両方必要な場面がある。</p>
+<p>例えば、顧客Aが<code>job-123</code>の生成を依頼した事実は、アプリ側でcustomerId/jobId等を記録しないと十分に追えない。CloudTrailだけで「顧客Aの操作履歴」が自動的に完成するわけではない。</p>
+<p>CloudTrailの管理イベントと、S3オブジェクトアクセス・一部DynamoDB操作等の<strong>データイベント</strong>は区別して、必要な範囲を設定する。</p>
+<h3>GuardDutyは遮断装置？</h3>
+<p>違う。基本的には<strong>検知</strong>。自動通知や遮断を行いたければEventBridge、SNSなどとの連携や別の対処を設計する。WAFもGuardDutyも「顧客ごとのJWT認証の代用品」ではない。</p>
+<p>なおCloudWatch、CloudTrail、GuardDutyの<strong>導入詳細や通知先は現在も設計対象</strong>であり、AWS環境に設定済みという意味ではない。</p>
+<hr />
+<h2 id="ch-9">9. KMSを採用しない、というのは「暗号化しない」の意味？</h2>
+<p><strong>違う。</strong> 今回採用しないのは<strong>専用のKMSカスタマー管理キーを自分たちで持つ設計</strong>。DynamoDBの標準暗号化、S3のSSE-S3、HTTPS/TLSなどの保護は使う。</p>
+<ul>
+<li>暗号化：許可されていない第三者による内容の読み取りを困難にする。</li>
+<li>請求データの完全性：正しい権限を持つ処理が誤って上書きしたり、二重計上したりすることを防ぐ。</li>
+</ul>
+<p>KMSを追加しても、正規のDynamoDB書き込み権限を持つプログラムがレコードを書き換える問題は自動では防げない。だから<strong>IAMの最小権限、条件付き書き込み、監査、バックアップと請求明細の保全</strong>を優先する。</p>
+<hr />
+<h2 id="ch-10">10. 請求まわりで本当に難しいところ</h2>
+<p>今回のシステムは顧客企業ごとにトークン使用量から料金を計算するため、<strong>JSONが生成できたか</strong>と<strong>トークンを何個使ったか</strong>を分けて考える必要がある。</p>
+<h3>例：Bedrockは成功したが、その後にWorkerが落ちた</h3>
+<ol>
+<li>Bedrockの推論自体は完了し、トークンが消費された。</li>
+<li>しかしWorkerがS3保存前、または使用量記録前に終了した。</li>
+<li>アプリ上は<code>FAILED</code>や不明な状態になり得る。</li>
+<li>再試行するとBedrockを再度呼び、<strong>AWS側では追加トークン消費が発生する可能性</strong>がある。</li>
+</ol>
+<p>したがって、<code>jobId</code>と個々のモデル実行の識別子、使用量イベントIDの対応付け、条件付き更新・二重計上防止・失敗時の突合が重要になる。</p>
+<p><strong>まだ決めていない業務ルール：</strong> 「トークンを消費したがJSONが手元に届かなかった場合、顧客に請求するか？」。これは技術構成だけで決まらないため、設計レビューで確認する。</p>
+<h3>SQSは必要ない？</h3>
+<p>SQSは<strong>メッセージをためて確実に順番に近い形で処理へ渡すためのキューサービス</strong>。再試行・滞留監視・障害時の分離に役立つ。今の構成ではAPI Lambda→Worker Lambdaの非同期Invokeを採用し、SQSは未採用。請求の正確性・障害耐性が厳しくなれば、優先的に見直す候補。</p>
+<hr />
+<h2 id="ch-11">11. 上司に聞かれそうな質問と、説明の骨子</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+  <th>質問</th>
+  <th>返答のポイント</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>なぜLambdaが2つ？</td>
+  <td>API受付とAI生成で処理時間・責務・IAM権限が違うから。受付はすぐ202を返せる</td>
+</tr>
+<tr>
+  <td>なぜ非同期？</td>
+  <td>Bedrock処理をHTTP接続の時間制限から分離するため。WPFはポーリングで完了確認</td>
+</tr>
+<tr>
+  <td>なぜ結果JSONをDynamoDBへ保存しない？</td>
+  <td>DynamoDBは1アイテム400KB。最大約1MBを想定するJSON本体はS3。DBには状態とS3キーを保存</td>
+</tr>
+<tr>
+  <td>なぜS3へクライアントが直接アクセス？</td>
+  <td>API Lambdaで認可して短命URLを発行。ファイル転送はS3に任せ、Lambdaの実行時間・サイズ制約を避ける</td>
+</tr>
+<tr>
+  <td>WAFとJWTは両方必要？</td>
+  <td>WAFはHTTP攻撃の検査、JWTは利用者認証。目的が違う</td>
+</tr>
+<tr><td>10:30に生成AIを再利用するときも認証し直す？</td><td>10:00に取得したJWTが有効ならWPFが再利用。<code>/auth</code>は不要。API Lambdaは毎リクエストJWTを検証</td></tr>
+<tr>
+  <td>CloudWatchとCloudTrailの違いは？</td>
+  <td>前者は稼働状況・アプリ操作ログ、後者はAWS API操作の監査証跡</td>
+</tr>
+<tr>
+  <td>GuardDutyがあればWAFは不要？</td>
+  <td>不要にならない。GuardDutyは主に脅威検知、WAFは入口でのHTTP検査</td>
+</tr>
+<tr>
+  <td>KMSを追加しないのは危険では？</td>
+  <td>専用顧客管理キーを使わないだけ。標準暗号化は継続。請求実績の整合性には条件付き書き込み・監査が直接効く</td>
+</tr>
+<tr>
+  <td>顧客ごとの利用料金はどう算出？</td>
+  <td>Workerで得たBedrockの実トークン使用量を顧客・ジョブ別に記録し、独自単価を適用。料金計算の詳細は設計中</td>
+</tr>
+<tr>
+  <td>Lambda Web Functionsへ変えない？</td>
+  <td>現時点ではNode.js中心でPython/FastAPIの移植が必要。REST API＋WAFの既存方針を維持</td>
+</tr>
+<tr>
+  <td>この構成は実装済み？</td>
+  <td>いいえ。現在は設計方針であり、AWSへのデプロイ済みとは区別する</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="ch-12">12. 口頭で話す練習（長さ別）</h2>
+<h3>20秒で説明</h3>
+<p>「WPFからAWSのREST APIへ依頼し、API Lambdaで認証と受付を行います。時間のかかるBedrock実行はWorker Lambdaに任せます。ジョブの状態はDynamoDB、生成したJSONはS3に保存し、クライアントはポーリング後に署名付きURLで取得します。」</p>
+<h3>1分で説明</h3>
+<p>「利用企業ごとに既存の保守キーで認証し、API LambdaがJWTを発行します。生成依頼が来たらジョブをDynamoDBへ登録し、Worker Lambdaを非同期起動するので、クライアントは結果を待たずジョブIDを受け取れます。WorkerはBedrockからJSONを生成してS3へ保存し、トークン使用量もサーバー側で記録します。クライアントは状態をポーリングし、完了したらAPI Lambdaが所有者を確認したうえでS3の短命署名URLを返します。入口はWAFで保護し、CloudWatchなどで運用を監視します。」</p>
+<h3>特に覚えておく3つの区別</h3>
+<ol>
+<li><strong>DynamoDBは管理台帳、S3は生成物の保管場所。</strong></li>
+<li><strong>JWTは顧客の認証、IAMはAWSサービス間の権限。</strong></li>
+<li><strong>CloudWatchは動作・障害、CloudTrailはAWS操作の監査、GuardDutyは脅威検知。</strong></li>
+</ol>
+<hr />
+<h2 id="ch-13">13. セルフチェック（答えを隠して考える）</h2>
+<p><strong>Q1. API LambdaはBedrockを直接呼び出す？</strong><br />
+<strong>答え：</strong> 呼び出さない。API LambdaはWorkerを非同期で起動し、WorkerがBedrockを呼ぶ。</p>
+<p><strong>Q2. WPFはDynamoDBに直接接続する？</strong><br />
+<strong>答え：</strong> しない。WPFはAPI Gatewayを通じてAPI Lambdaに問い合わせる。</p>
+<p><strong>Q3. 顧客Aが顧客BのjobIdを知ったらJSONを取得できる？</strong><br />
+<strong>答え：</strong> 取得させてはいけない。API LambdaがJWTのcustomerIdとジョブ所有者を照合してからURLを発行する。</p>
+<p><strong>Q4. JSON保存にS3を使うのは、APIからのレスポンスが1MBを超えるから？</strong><br />
+<strong>答え：</strong> 主な理由は生成物の保存・配信と、DynamoDBの1アイテム400KB制限。非同期処理の完了時に成果物を保持する場所も必要。</p>
+<p><strong>Q5. トークンが消費され、保存に失敗した場合の請求可否は決まっている？</strong><br />
+<strong>答え：</strong> 未決定。実使用量は記録し、顧客へ請求するかという業務ルールと分離して検討する。</p>
+<p><strong>Q6. すべてのセキュリティサービスはもうAWS上に作成した？</strong><br />
+<strong>答え：</strong> いいえ。現在の資料は設計方針。設定値や運用詳細もこれから決める。</p>
+<p><strong>Q7. 同じWPFで30分後に再度AIを使う場合、JWTは誰が再利用する？</strong><br />
+<strong>答え：</strong> WPFがメモリに保持したJWTを再利用する。有効期限内は<code>POST /auth</code>不要。API Lambdaは毎リクエストJWTを検証する。</p>
+</div></main></div><footer>個人学習用資料 / アーキテクチャ図と併せて読む</footer></body></html>
