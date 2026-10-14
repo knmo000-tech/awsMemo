@@ -17,26 +17,33 @@ WPF（.NET Framework 4.8）から HTTPS で API Gateway を通じて、**FastAPI
 
 ```mermaid
 flowchart TD
-    C["WPFクライアント"] -->|"HTTPS"| WF["AWS WAF<br/>マネージドルール・レート制限"]
+    C["WPFクライアント"] -->|"HTTPS"| WF["AWS WAF<br/>REST API用Web ACL"]
     subgraph AWS["AWS Cloud"]
-      WF --> GW["API Gateway REST API<br/>採用方針"]
-      GW --> A["API Lambda<br/>FastAPI + Mangum"]
+      WF --> GW["API Gateway<br/>REST API / APIキー不要"]
+      GW --> A["API Lambda<br/>FastAPI + Mangum<br/>/auth /jobs /jobs/{jobId}"]
       A -->|"非同期Invoke"| W["Worker Lambda<br/>Python / Bedrock処理"]
-      A <--> D[("DynamoDB<br/>Customers / Jobs")]
-      W --> D
-      W --> U[("DynamoDB<br/>UsageEvents（案）")]
-      W --> B["Amazon Bedrock"]
-      W --> S[("S3<br/>生成CSV")]
-      A -->|"署名付きURL発行"| S
-      SM["Secrets Manager"] -.->|"JWT署名鍵取得"| A
-      CT["CloudTrail<br/>AWS操作監査"] -.-> AUDIT[("監査ログ保存先S3")]
-      GD["GuardDuty<br/>脅威検出"] --> EV["EventBridge → SNS等<br/>通知"]
-      LOG["CloudWatch<br/>APIアクセス・Lambdaログ/アラーム"]
+      W <-->|"生成結果・利用量"| B["Amazon Bedrock"]
+      subgraph DDB["Amazon DynamoDB"]
+        CU["Customers<br/>顧客・保守キー照合"]
+        J["Jobs<br/>状態・顧客所有者"]
+        U["UsageEvents（設計案）<br/>物理別テーブル化は未確定"]
+      end
+      A --> CU
+      A <--> J
+      W -->|"状態更新"| J
+      W -.->|"利用量記録（案）"| U
+      W -->|"生成CSV保存"| S[("Amazon S3<br/>CSV成果物")]
+      A -.->|"署名付きURL発行"| S
+      A -.->|"JWT署名鍵取得"| SM["Secrets Manager"]
+      CT["CloudTrail<br/>AWS操作監査"] -.-> AUDIT[("S3<br/>監査ログ保存")]
+      GD["GuardDuty<br/>脅威検知"] --> EV["EventBridge"]
+      EV --> SNS["Amazon SNS<br/>通知先は要設定"]
+      LOG["CloudWatch<br/>APIアクセス・アプリ監査・障害ログ"]
       GW -.-> LOG
       A -.-> LOG
       W -.-> LOG
     end
-    C -->|"短命署名付きURLでCSV取得"| S
+    C -.->|"署名URLでCSVダウンロード"| S
 ```
 
 **注:** CloudTrail / GuardDuty の破線等は監査・保護の論理関係であり、リクエストの通信経路ではない。GuardDutyは検知サービスで、自動ブロックには別の対処設定が必要。S3のURLは認可確認後だけ発行する。
