@@ -4,7 +4,7 @@
 
 今回のシステムは、**複数の顧客企業が利用するWPFデスクトップアプリからAmazon BedrockでJSONを生成するサービス**。API受付とAI実行を分離し、顧客認証・ジョブ管理・利用量に基づく請求・監査まで考慮する。
 
-GitHubの図と併せて読む：[全体アーキテクチャ](../architecture.md) ／ [業務構成図](../diagrams/aws-architecture-rev4-business.svg) ／ [セキュリティ・監査図](../diagrams/aws-architecture-rev4-security.svg)
+GitHubの図と併せて読む：[全体アーキテクチャ](../構成設計.md) ／ [業務構成図](../diagrams/AWS構成図_rev4_業務フロー.svg) ／ [セキュリティ・監査図](../diagrams/AWS構成図_rev4_セキュリティ監査.svg)
 
 ## 1. 最初に押さえる「登場人物の役割」
 
@@ -353,3 +353,13 @@ SQSは**メッセージをためて確実に順番に近い形で処理へ渡す
 
 **Q7. 同じWPFで30分後に再度AIを使う場合、JWTは誰が再利用する？**  
 **答え：** WPFがメモリに保持したJWTを再利用する。有効期限内は`POST /auth`不要。API Lambdaは毎リクエストJWTを検証する。
+## 2026-10-19補足：ゼロベース比較とSQSの導入検討
+
+本ノート本文の「直接非同期Invoke」「SQS未採用」は元の採用案の説明。複数企業が並列で利用する条件で比較した結果、**Regional REST API + WAF直接連携 + 通常Lambda**を第一候補と再確認した。SQS Standard Fair Queuesの追加は導入推奨・**採用未確定**。
+
+- 100社・20営業日・8時間、1社1日5/50/100ジョブで月1万/10万/20万ジョブ。
+- SQS Standardに`MessageGroupId=customerId`を設定して企業間の待機偏りを緩和するが、企業ごとの利用上限や保証された実行枠ではない。
+- Web Functionsの多重同時HTTP処理や課金体系は魅力だが、WAFにはCloudFront + オリジン保護が必要。非同期設計・S3・DynamoDB・ポーリングは変わらない。
+- API受付料金・RPS・Workerの必要並列数は[2026-10-19比較試算](../比較検討/2026-10-19_非同期Bedrock基盤とAPI方式の比較.md)参照。費用も性能も実測ではない。
+- rev4図はSQS追加前の履歴図。構成設計に追加候補のMermaid図を掲載。
+

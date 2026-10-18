@@ -41,7 +41,7 @@ WAFのルールはまずCountで正規リクエストへの影響を検証し、
 - API Gatewayメソッド認証 `NONE` のLambdaプロキシ統合でAPI Lambda（FastAPI + Mangum）へ転送する。これはAPI Gateway自身が認証を行わないという意味であり、APIが無認証になる設計ではない。
 - `POST /auth` は従来の保守キーと顧客名をDynamoDBに照合し、成功時にJWTを発行する。
 - `POST /jobs`、`GET /jobs/{jobId}` はJWTを検証し、顧客IDによる所有権・権限を確認する。
-- 署名鍵はSecrets Managerに保管する（[ADR-0006](0006-audit-security.md)）。
+- 署名鍵はSecrets Managerに保管する（[ADR-0006](0006_監査とセキュリティ.md)）。
 - REST APIのAPIキーは認証そのものの代用ではないため、未使用でも現在の要件を満たせる。
 
 ## 再検討条件
@@ -55,3 +55,13 @@ API呼び出し回数、許容コスト、顧客アクセス元、CloudFront導�
 参考: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html
 
 APIキー設定: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-setup-api-keys.html
+
+## 2026-10-19：ゼロベースで再評価
+
+Python等の既存資産を無視し、WAF必須・100社・手動ボタン押下による単発生成・月1万〜20万ジョブ・非同期処理という条件で、REST API + WAF直接連携を第一候補として再確認。
+
+- HTTP API + CloudFront + WAFはAPI Gatewayの公開URLへ直接アクセスされる場合の**WAF迂回対策**が別途必要。
+- Web Functions + CloudFront + WAFはHTTP多重並列やCPU稼働時間ベースの課金が長所だが、今回の受付APIは短時間・非同期で、長時間のHTTP応答は不要。
+- この想定規模ではAPI受付の方式間の従量料金差は比較的小さい。ただしWAF/CloudFront/転送/ログ等を含む総額は未算定。
+
+[試算資料](../比較検討/2026-10-19_非同期Bedrock基盤とAPI方式の比較.md) / [Web Functions ADR](0008_Web-Functions比較.md)。

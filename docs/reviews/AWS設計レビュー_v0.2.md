@@ -2,7 +2,7 @@
 
 ## システム構成
 
-[業務処理図](../diagrams/aws-architecture-rev4-business.svg) / [セキュリティ・監査図](../diagrams/aws-architecture-rev4-security.svg)
+[業務処理図](../diagrams/AWS構成図_rev4_業務フロー.svg) / [セキュリティ・監査図](../diagrams/AWS構成図_rev4_セキュリティ監査.svg)
 
 WPF → WAF → API Gateway REST API → API Lambda（FastAPI + Mangum）→ Worker Lambda → Bedrock。生成JSONはWorkerがS3に保存し、WPFがジョブ状態をポーリングして署名付きURLから取得する。
 
@@ -36,3 +36,8 @@ WPF → WAF → API Gateway REST API → API Lambda（FastAPI + Mangum）→ Wor
 3. 保守キー・JWTの有効期限、漏えい・失効・鍵更新方法。
 4. 顧客別の利用量上限、課金単価・計算方法、月次請求明細の保全。
 5. JSONスキーマ、成果物・監査ログの保存期間、WAF閾値、障害通知先。
+
+## 2026-10-19 追記
+
+上記の比較表とrev4構成図は元のレビュー時点の設計を示す履歴である。現在はREST API + WAFを第一候補と再確認し、SQS Fair Queuesを導入推奨の検討候補とした。非同期、結果S3保管、ジョブDynamoDB管理は維持。100社・月1万/10万/20万ジョブの試算は[比較資料](../比較検討/2026-10-19_非同期Bedrock基盤とAPI方式の比較.md)、[ADR-0009](../adr/0009_SQS公平キュー導入検討.md)参照。
+
