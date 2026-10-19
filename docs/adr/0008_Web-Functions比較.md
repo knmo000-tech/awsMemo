@@ -4,6 +4,8 @@
 - **再評価**：2026-10-19（既存Python/FastAPI資産を前提から除外）
 - **ステータス**：Web Functions不採用（現時点）／REST API + WAF + Event Functionsを第一候補
 
+**2026-10-20追記**：CloudFront OAC＋IamAuthによるWeb Functionsのオリジン保護と、10秒ポーリング・月140万API要求の楽観/標準/悲観料金モデルを再評価。正式な採否変更はなく、実測前の参考比較。詳細は[2026-10-20の比較資料](../比較検討/2026-10-20_REST-APIとWeb-Functions採用比較.md)を参照。
+
 ## 比較の前提
 100企業がWPFのボタン押下でジョブを1件ずつ作成。月間1万・10万・20万ジョブ、20営業日×8時間を仮定する。非同期方式は維持。S3に最大約1MBの生成JSON、DynamoDBに顧客・ジョブ・使用量、Worker LambdaからBedrock呼び出し。SQS Fair Queuesは導入推奨の検討候補。
 
