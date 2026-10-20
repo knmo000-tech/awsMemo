@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101b2e">
+<title>AWS料金シミュレーター｜REST API vs Lambda Web Functions</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:#15233b;background:#f3f6fb;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:20px 16px 56px}a{color:#1162bb}h1{font-size:clamp(24px,5vw,36px);line-height:1.35;margin:8px 0}h2{font-size:20px;margin:0 0 15px}h3{font-size:16px;margin:0 0 12px}.hero{background:#101b2e;color:#fff;padding:32px 20px;border-radius:22px;margin-bottom:20px}.hero p{color:#b9c8e0;line-height:1.7;max-width:750px}.eyebrow{font-size:12px;letter-spacing:.08em;color:#94dbcb;font-weight:800}.pill{display:inline-block;border-radius:999px;padding:5px 10px;background:#d8efe7;color:#075f4c;font-size:12px;font-weight:700}.hero .pill{background:#1f3b46;color:#b2f3db}.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}.card{background:#fff;border:1px solid #dfe6f0;border-radius:18px;padding:20px;box-shadow:0 5px 20px #1e335007}.wide{grid-column:1/-1}.muted,.note{color:#5c6c82}.note{font-size:12px;line-height:1.65}.field{padding:11px 0;border-bottom:1px solid #edf1f5}.field:last-child{border-bottom:0}.field-head{display:flex;justify-content:space-between;gap:15px;align-items:baseline;margin-bottom:9px;font-size:14px}.field-head strong{white-space:nowrap;font-variant-numeric:tabular-nums}.hint{font-size:12px;color:#6c7890;margin:3px 0 8px}input[type=range]{width:100%;accent-color:#0b9b7c;cursor:pointer;min-height:30px}button,select,input[type=number]{font:inherit}button{border:1px solid #d6dfec;background:#fff;color:#153456;padding:11px 15px;border-radius:12px;font-weight:700;cursor:pointer}button:hover{background:#f4f8fa}button.selected{background:#0f826e;color:#fff;border-color:#0f826e}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #68b4f6;outline-offset:2px}.scenario{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}.scenario button{flex:1;min-width:90px} .metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px}.metric{border-radius:14px;padding:17px;background:#f4f7fb}.metric.green{background:#e3f5ee}.metric .name{font-size:12px;color:#586b84;margin-bottom:5px}.metric .number{font-size:clamp(23px,4.6vw,32px);font-weight:850;font-variant-numeric:tabular-nums;white-space:nowrap}.metric small{font-size:12px;color:#62738a}.verdict{border-radius:12px;background:#e8f7f1;padding:12px 14px;color:#095b4b;font-weight:700;margin-top:14px;line-height:1.6}.bars{margin-top:20px;display:grid;gap:14px}.bar-head{display:flex;justify-content:space-between;gap:9px;font-size:13px;margin-bottom:5px}.track{height:17px;background:#e7edf5;border-radius:50px;overflow:hidden}.fill{height:100%;width:0;background:#63748b;border-radius:50px;transition:width .22s}.fill.web{background:#0e9c80}.breakdown{width:100%;border-collapse:collapse;font-size:13px}.breakdown th,.breakdown td{padding:10px 8px;border-bottom:1px solid #e9eef5;text-align:left}.breakdown td:nth-child(n+2),.breakdown th:nth-child(n+2){text-align:right;font-variant-numeric:tabular-nums}.breakdown tfoot{font-weight:800;background:#f4f7fa}.callout{background:#f0f6fc;border-left:4px solid #3778bb;border-radius:8px;padding:12px 14px;margin:14px 0;line-height:1.65;font-size:13px}.inputs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.inputs label{font-size:12px;font-weight:700;display:flex;flex-direction:column;gap:6px}.inputs input{width:100%;border:1px solid #ccd6e4;border-radius:9px;padding:9px;background:#fff}.section-intro{color:#5d6c83;font-size:13px;line-height:1.75}details{border-top:1px solid #e3e8ef;padding:14px 0}summary{cursor:pointer;font-weight:750}ul{padding-left:20px;line-height:1.85}footer{margin-top:25px;color:#62748b;font-size:12px;line-height:1.9}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.label-value{font-variant-numeric:tabular-nums;font-weight:800}.tag{font-size:11px;background:#fff0d9;color:#8a4b04;border-radius:999px;padding:4px 8px;vertical-align:middle}.sr-only{position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;overflow:hidden}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.wide{grid-column:1}.card{padding:17px}.hero{padding:24px 18px}.inputs{grid-template-columns:1fr 1fr}.metric{padding:13px}}
+@media(max-width:400px){.inputs{grid-template-columns:1fr}.metric .number{font-size:23px}}
+</style>
+</head>
+<body><main>
+<header class="hero">
+<div class="eyebrow">AWS ARCHITECTURE COST LAB / 2026-10-20</div>
+<h1>REST API と Web Functions<br>料金シミュレーター</h1>
+<p>100社向け非同期Bedrock APIの受付部分を比較。スライダーを動かすと、料金・リクエスト数・損益分岐点が即時更新されます。iPhoneでもそのまま操作できます。</p>
+<span class="pill">見積もり用の仮定・実請求ではありません</span>
+</header>
+<div class="layout">
+<section class="card">
+<h2>① 共通の利用条件</h2>
+<p class="section-intro">両構成に同じAPIリクエスト数を適用します。S3へ直接取得するJSONの通信は含みません。</p>
+<div class="field"><div class="field-head"><label for="companies">顧客企業数</label><strong id="companiesOut"></strong></div><input id="companies" type="range" min="10" max="300" step="10" value="100"></div>
+<div class="field"><div class="field-head"><label for="daily">1社・1営業日の生成回数</label><strong id="dailyOut"></strong></div><input id="daily" type="range" min="5" max="150" step="5" value="50"></div>
+<div class="field"><div class="field-head"><label for="days">営業日/月</label><strong id="daysOut"></strong></div><input id="days" type="range" min="10" max="26" step="1" value="20"></div>
+<div class="field"><div class="field-head"><label for="duration">1ジョブの生成時間</label><strong id="durationOut"></strong></div><input id="duration" type="range" min="30" max="300" step="10" value="120"><p class="hint">この時間はWorker/Bedrock側。API受付の実行時間ではありません。</p></div>
+<div class="field"><div class="field-head"><label for="poll">ステータスポーリング間隔</label><strong id="pollOut"></strong></div><input id="poll" type="range" min="5" max="60" step="5" value="10"></div>
+<div class="field"><div class="field-head"><label for="auth">認証（POST /auth）の頻度</label><strong id="authOut"></strong></div><input id="auth" type="range" min="0" max="1" step=".1" value="1"><p class="hint">1=1ジョブに1回。0.1=10ジョブに1回。JWT再利用時は減らせます。</p></div>
+</section>
+<section class="card">
+<h2>② Web Functionsの負荷仮定</h2>
+<p class="section-intro">実測がないため、楽観・標準・悲観の3ケースを用意しました。手動調整もできます。</p>
+<div class="scenario" role="group" aria-label="シナリオ選択">
+<button data-case="optimistic" type="button">楽観</button>
+<button data-case="standard" class="selected" type="button">標準</button>
+<button data-case="pessimistic" type="button">悲観</button>
+</div>
+<div class="field"><div class="field-head"><label for="cpu">1API要求のCPU実働時間</label><strong id="cpuOut"></strong></div><input id="cpu" type="range" min="1" max="80" step="1" value="15"><p class="hint">DB待ち時間ではなくCPUを使っていた時間。</p></div>
+<div class="field"><div class="field-head"><label for="memory">実行環境あたりの平均メモリ</label><strong id="memoryOut"></strong></div><input id="memory" type="range" min=".1" max="2" step=".1" value=".5"></div>
+<div class="field"><div class="field-head"><label for="hours">全実行環境の月間累計稼働時間</label><strong id="hoursOut"></strong></div><input id="hours" type="range" min="0" max="1500" step="10" value="300"><p class="hint">3環境×100時間なら合計300時間。営業時間と同じではありません。</p></div>
+<div class="callout">AWSにデプロイしていない段階では、この3項目は推定です。特に環境稼働時間が料金差を大きく左右します。</div>
+</section>
+<section class="card wide" aria-live="polite">
+<h2>③ 比較結果 <span class="tag">API受付・WAF込み</span></h2>
+<div class="metrics">
+<div class="metric"><div class="name">REST API ＋ 通常Lambda ＋ WAF</div><div id="restTotal" class="number"></div><small>月額 / USD</small></div>
+<div class="metric green"><div class="name">Web Functions ＋ CloudFront ＋ WAF</div><div id="webTotal" class="number"></div><small>月額 / USD</small></div>
+</div>
+<div id="verdict" class="verdict"></div>
+<div class="bars">
+<div><div class="bar-head"><span>REST API構成</span><strong id="restBarText"></strong></div><div class="track"><div class="fill" id="restBar"></div></div></div>
+<div><div class="bar-head"><span>Web Functions構成</span><strong id="webBarText"></strong></div><div class="track"><div class="fill web" id="webBar"></div></div></div>
+</div>
+<div class="callout"><strong>利用量：</strong><span id="usage"></span><br><strong>損益分岐点：</strong><span id="breakeven"></span></div>
+<div class="actions"><button id="reset" type="button">初期値に戻す</button><button id="copy" type="button">試算結果をコピー</button></div>
+</section>
+<section class="card wide">
+<h2>④ 料金の内訳</h2>
+<p class="section-intro">REST API構成とWeb Functions構成で費用の発生箇所が異なります。すべて月額、USDで表示。</p>
+<div style="overflow-x:auto"><table class="breakdown"><thead><tr><th>費用項目</th><th>REST API</th><th>Web Functions</th></tr></thead><tbody>
+<tr><td>API Gateway REST要求</td><td id="restGateway"></td><td>—</td></tr>
+<tr><td>通常Lambda（要求・実行）</td><td id="restLambda"></td><td>—</td></tr>
+<tr><td>Web Functions（要求）</td><td>—</td><td id="webRequest"></td></tr>
+<tr><td>Web Functions（CPU実働）</td><td>—</td><td id="webCPU"></td></tr>
+<tr><td>Web Functions（メモリ環境時間）</td><td>—</td><td id="webMemory"></td></tr>
+<tr><td>CloudFront HTTPリクエスト</td><td>—</td><td id="cloudfront"></td></tr>
+<tr><td>WAF（固定料金＋要求）</td><td id="wafRest"></td><td id="wafWeb"></td></tr>
+</tbody><tfoot><tr><td>月額合計</td><td id="restFoot"></td><td id="webFoot"></td></tr></tfoot></table></div>
+<p class="note">※ WAFは両者同じ固定料金を仮定しています。実際はRegional/CloudFrontのルールや料金体系の相違・ルールグループの課金数を再確認してください。</p>
+</section>
+<section class="card wide">
+<h2>⑤ 単価と前提を編集 <span class="tag">上級者向け</span></h2>
+<p class="section-intro">2026年10月の比較資料で使った参考単価を初期値にしています。Pricing Calculatorの見積もり値が分かったら、ここを書き換えて比較できます。通常Lambdaは「100万API要求あたりの処理費」にまとめています。</p>
+<div class="inputs">
+<label>REST API / 100万要求（USD）<input type="number" id="restRate" step=".01" min="0" value="4.25"></label>
+<label>通常Lambda / 100万要求（USD）<input type="number" id="lambdaRate" step=".01" min="0" value=".60"></label>
+<label>Web Functions / 100万要求（USD）<input type="number" id="webRate" step=".01" min="0" value=".30"></label>
+<label>Web Functions / vCPU秒（USD）<input type="number" id="cpuRate" step=".00000001" min="0" value=".0000322421"></label>
+<label>Web Functions / GB秒（USD）<input type="number" id="memRate" step=".00000001" min="0" value=".0000042688"></label>
+<label>CloudFront / 100万要求（USD）<input type="number" id="cfRate" step=".01" min="0" value="1.20"></label>
+<label>WAF固定料金 / 月（USD）<input type="number" id="wafFixed" step=".01" min="0" value="11"></label>
+<label>WAF / 100万要求（USD）<input type="number" id="wafRate" step=".01" min="0" value=".60"></label>
+</div>
+<p class="note">計算式（日本語）：REST＝REST要求料金＋通常Lambda料金＋WAF。Web＝Web要求料金＋CPU実働料金＋メモリ使用GB×累計環境秒の料金＋CloudFront要求料金＋WAF。両構成の料金の定額/従量プラン、無料枠・AWS利用状況により実請求額は変動します。</p>
+</section>
+<section class="card wide">
+<h2>⑥ 設計と見積もりの注意点</h2>
+<details open><summary>今回のシミュレーションに含めていない料金</summary><ul><li>CloudFront・API Gateway・Web Functionsの外部データ転送量、ログ、カスタムドメイン関連</li><li>Bedrock、SQS、Worker Lambda、DynamoDB、S3、Secrets Manager、CloudWatchなどの共通バックエンド</li><li>無料枠、段階料金、CloudFront定額プラン、税金・為替、失敗時の再試行</li><li>WAFの追加本文検査、WCU超過、Bot Control、課金対象のマネージドルール</li></ul></details>
+<details><summary>REST APIを採用する場合</summary><p class="section-intro">Regional REST APIのステージにAWS WAFを直接関連付け。通常Lambdaで認証・ジョブ登録・状態照会。WAF設定、API管理、運用が単純で、短時間のREST APIに向きます。</p></details>
+<details><summary>Web Functionsを採用する場合</summary><p class="section-intro">CloudFront＋WAFからOAC署名でIamAuthのWeb Functionsへ転送。オリジン直接アクセスをIAMポリシーで制限。JWT/Authorizationの転送・Webキャッシュ無効・企業間のリクエスト状態分離を検証します。HTTP並列処理やI/O待ちの多いAPIに向きます。</p></details>
+<details><summary>PoCで測定すべき値</summary><p class="section-intro">Web FunctionsのCPU実働時間、メモリ使用量、全環境の累計アクティブ時間、実際の同時リクエスト数、応答時間p95、エラー率。通常Lambdaの平均実行時間も同じ負荷条件で計測してください。</p></details>
+<p class="note">関連資料：<a href="../比較検討/2026-10-20_REST-APIとWeb-Functions採用比較.md">REST APIとWeb Functionsの採用比較</a> ／ <a href="../比較検討/2026-10-20_AWS料金見積もり試算.md">AWS料金見積もり試算</a>。各単価は<a href="https://aws.amazon.com/lambda/pricing/">AWS Lambda料金</a>、<a href="https://aws.amazon.com/api-gateway/pricing/">API Gateway料金</a>、<a href="https://aws.amazon.com/cloudfront/pricing/">CloudFront料金</a>、<a href="https://aws.amazon.com/waf/pricing/">WAF料金</a>で再確認してください。</p>
+</section>
+</div><footer>このページはHTML/JavaScriptのみで動き、外部ライブラリ・通信・AWS認証を必要としません。入力値はブラウザに保存しません。比較結果は意思決定のための試算であり、請求額の保証ではありません。</footer>
+</main>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const ids=["companies","daily","days","duration","poll","auth","cpu","memory","hours","restRate","lambdaRate","webRate","cpuRate","memRate","cfRate","wafFixed","wafRate"];
+const profiles={optimistic:{cpu:5,memory:.3,hours:100},standard:{cpu:15,memory:.5,hours:300},pessimistic:{cpu:40,memory:1,hours:800}};
+const usd=x=>"$"+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const n=id=>Math.max(0,Number($(id).value)||0);
+const fmt=x=>x.toLocaleString("ja-JP",{maximumFractionDigits:1});
+function render(){
+ const companies=n("companies"),daily=n("daily"),days=n("days"),duration=n("duration"),poll=Math.max(1,n("poll")),auth=n("auth");
+ const jobs=companies*daily*days, polls=Math.ceil(duration/poll),requests=jobs*(1+polls+auth),million=requests/1e6;
+ const cpu=n("cpu"),mem=n("memory"),hours=n("hours");
+ const gateway=million*n("restRate"),lambda=million*n("lambdaRate");
+ const wReq=million*n("webRate"),wCpu=requests*cpu/1000*n("cpuRate"),wMem=mem*hours*3600*n("memRate");
+ const cf=million*n("cfRate"),waf=n("wafFixed")+million*n("wafRate");
+ const rest=gateway+lambda+waf,web=wReq+wCpu+wMem+cf+waf;
+ Object.entries({companies:fmt(companies)+"社",daily:fmt(daily)+"件",days:fmt(days)+"日",duration:fmt(duration)+"秒",poll:fmt(poll)+"秒",auth:fmt(auth)+"回/ジョブ",cpu:fmt(cpu)+"ms",memory:fmt(mem)+"GB",hours:fmt(hours)+"時間"}).forEach(([k,v])=>$(k+"Out").textContent=v);
+ $("restTotal").textContent=usd(rest);$("webTotal").textContent=usd(web);
+ const diff=Math.abs(rest-web),low=rest<=web?"REST API":"Web Functions";
+ $("verdict").textContent=diff<.005?"この条件では、両構成の料金はほぼ同じです。":low+"構成が月"+usd(diff)+"安い試算です。ただし実測前の参考値です。";
+ const top=Math.max(rest,web,.00001);
+ $("restBar").style.width=(rest/top*100)+"%";$("webBar").style.width=(web/top*100)+"%";
+ $("restBarText").textContent=usd(rest);$("webBarText").textContent=usd(web);
+ $("usage").textContent=fmt(jobs)+"ジョブ/月、"+fmt(polls)+"回の状態確認/ジョブ、"+fmt(Math.round(requests))+" API要求/月";
+ const baseline=wReq+wCpu+cf+waf, rate=mem*3600*n("memRate"), limit=rate>0?(rest-baseline)/rate:Infinity;
+ $("breakeven").textContent=rate<=0?"メモリ課金が0なので環境時間による逆転なし":limit<0?"環境時間が0でもREST APIのほうが安い試算": "全実行環境の累計稼働が約"+fmt(limit)+"時間/月を超えるとREST APIが安くなる試算";
+ Object.entries({restGateway:gateway,restLambda:lambda,webRequest:wReq,webCPU:wCpu,webMemory:wMem,cloudfront:cf,wafRest:waf,wafWeb:waf,restFoot:rest,webFoot:web}).forEach(([k,v])=>$(k).textContent=usd(v));
+ window.latestSummary="利用量 "+jobs+"ジョブ/月、API "+Math.round(requests)+"回/月。REST API構成 "+usd(rest)+"/月、Web Functions構成 "+usd(web)+"/月。Web FunctionsのCPU "+cpu+"ms/要求、平均メモリ "+mem+"GB、累計環境稼働 "+hours+"時間。実測前の参考試算。";
+}
+function profile(key){Object.entries(profiles[key]).forEach(([k,v])=>$(k).value=v);document.querySelectorAll("[data-case]").forEach(b=>b.classList.toggle("selected",b.dataset.case===key));render();}
+ids.forEach(id=>$(id).addEventListener("input",()=>{if(["cpu","memory","hours"].includes(id))document.querySelectorAll("[data-case]").forEach(b=>b.classList.remove("selected"));render()}));
+document.querySelectorAll("[data-case]").forEach(b=>b.addEventListener("click",()=>profile(b.dataset.case)));
+$("reset").addEventListener("click",()=>{const values={companies:100,daily:50,days:20,duration:120,poll:10,auth:1,restRate:4.25,lambdaRate:.6,webRate:.3,cpuRate:.0000322421,memRate:.0000042688,cfRate:1.2,wafFixed:11,wafRate:.6};Object.entries(values).forEach(([k,v])=>$(k).value=v);profile("standard")});
+$("copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(window.latestSummary);$("copy").textContent="コピーしました";setTimeout(()=>$("copy").textContent="試算結果をコピー",1600)}catch(e){$("copy").textContent="コピーできませんでした"}});
+render();
+</script>
+</body></html>

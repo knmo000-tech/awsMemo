@@ -41,6 +41,10 @@
 | [AWS料金見積もり試算（DynamoDB・S3・WAF・API Gateway）](docs/比較検討/2026-10-20_AWS料金見積もり試算.md) | 100社・月10万ジョブ・10秒ポーリングの入力値と計算式 |
 | [2026-10-19 API方式とSQS・概算比較](docs/比較検討/2026-10-19_非同期Bedrock基盤とAPI方式の比較.md) | Web Functions、SQS公平性、月1万・10万・20万件の試算 |
 
+## 操作できる料金シミュレーター
+
+- [REST API vs Web Functions・料金シミュレーター（HTML）](docs/learning/AWS料金シミュレーター.html)：スライダー・3ケース切替・内訳・損益分岐点。ブラウザで直接開くかGitHub Pagesで配信して利用（GitHubのコード表示画面では操作不可）。
+
 ## 個人学習用
 
 [構成の理解ノート（Markdown）](docs/learning/AWS構成の理解ノート.md) / [ブラウザで読む（HTML）](docs/learning/AWS構成の理解ノート.html)
