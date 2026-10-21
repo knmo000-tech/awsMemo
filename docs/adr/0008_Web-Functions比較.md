@@ -74,6 +74,47 @@ flowchart TB
 
 B/Cはいずれか一方を選ぶ。受付APIはジョブ所有者の認可後に署名URLを返す。Secrets Manager・監査系は両案共通のため図から省略。
 
+### Web Functionsを採用する場合の構成案（2026-10-22追記）
+
+**Web Functionsも今回の要件を満たせる有力な選択肢。Node.jsでの開発とCloudFrontの追加設定を受け入れられるなら、新技術の学習価値や開発体験を理由に試す判断も合理的である。** RESTを第一候補とするのは主にWAF直接連携による運用の単純さからであり、Webに重大な不適合があるためではない。既存Python/FastAPI資産の有無・移植費用は、この判断の理由に含めない。
+
+費用・性能が同程度かは未実測。まずWeb案を試作し、必要な保護・復旧・費用条件を満たすことを確認する。以下はSQSを含む検証候補であり、Web/SQSの正式採用を決定した図ではない。
+
+```mermaid
+flowchart TB
+  C["AWS外：WPFアプリ"]
+  subgraph AWS["AWS Cloud"]
+    F["CloudFront ＋ AWS WAF"]
+    A["Lambda Web Functions：受付API"]
+    D[("DynamoDB：顧客・残量・ジョブ")]
+    Q["SQS Standard Fair Queues：生成待ち"]
+    W["Lambda Event Functions：生成Worker"]
+    B["Amazon Bedrock"]
+    S[("S3：生成JSON")]
+    X["DLQ：繰り返し失敗したジョブ"]
+    F -->|"OAC署名・IamAuth"| A
+    A <-->|"認証・残量・状態確認"| D
+    A -->|"ジョブ投入"| Q
+    Q -->|"イベントソースで実行数制御"| W
+    Q -.->|"受信回数の上限到達"| X
+    W <-->|"生成要求・結果"| B
+    W -->|"結果保存"| S
+    W -->|"状態・使用量更新"| D
+  end
+  C <-->|"認証・ジョブ受付・状態照会"| F
+  C -.->|"署名URLで結果取得"| S
+```
+
+| 部分 | 役割・設定 |
+| --- | --- |
+| CloudFront + WAF | 公開入口。認証・状態APIはキャッシュ無効。OACと対象配信限定の許可でオリジンを保護 |
+| Web Functions | Node.jsで `/auth`・`/jobs`・`/jobs/{jobId}` を実装。トークン・所有者を検証し、ジョブ受付後に `202 + jobId` を返す |
+| SQS | 待機ジョブを保持。`MessageGroupId=customerId` で企業間の待機偏りを緩和 |
+| Event Worker | Bedrock生成、S3保存、使用量・状態更新。Web受付とは独立して実行数を制限 |
+| DynamoDB・S3 | 状態・残量・成果物を永続化。認可後にWeb受付が結果の署名URLを返す |
+
+**受付はWeb、生成はEventという併用構成**とする。[1][3] 鍵管理・ログ・監査系は省略。OACの認証とアプリのトークン認証は別で、ヘッダー転送等は次節の設定に従う。[2] SQS投入失敗・重複配送・残量整合性への対応は第4節を適用する。
+
 ## 3. API入口の比較：REST + Event 対 CloudFront + Web
 
 | 観点 | REST API + Event | CloudFront + Web | 今回への影響 |
@@ -195,7 +236,7 @@ SQSとWorkerを省ける可能性はあるが、保存・認可・残量整合�
 
 | 判断 | 今回の結果 | 見直す条件 |
 | --- | --- | --- |
-| API入口 | **REST + WAF + Eventを維持** | Webで同じ保護・機能を満たし、費用かp95に運用負担を上回る実測差がある |
+| API入口 | **REST + WAF + Eventを維持** | Webで同じ保護・機能と許容費用・性能を満たし、開発体験・学習価値も含め追加運用を受け入れられる |
 | SQS | **Standard Fair Queuesを導入推奨、正式決定は保留** | 集中負荷での顧客別待ち時間、DLQ回復、費用を確認してADR-0009で決定 |
 | API/Worker分離 | 維持 | ストリーミング等で製品要件が変わる |
 | 言語・既存資産 | 移植費用を理由にWebを除外しない | Python必須ならWebの現行対応言語が制約になる |
