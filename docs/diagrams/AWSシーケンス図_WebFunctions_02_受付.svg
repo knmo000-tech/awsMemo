@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="2297" viewBox="0 0 2100 2297" role="img" aria-labelledby="title desc">
+<title id="title">2. 受付：ジョブとOutboxをまとめて保存する</title>
+<desc id="desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="2297" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">2. 受付：ジョブとOutboxをまとめて保存する</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V2197" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<rect x="75.0" y="2197" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="2231" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<path d="M773.3333333333334,180 V2197" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="628.3333333333334" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<rect x="628.3333333333334" y="2197" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="2231" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<path d="M1326.6666666666667,180 V2197" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1181.6666666666667" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="1181.6666666666667" y="2197" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="2231" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M1880.0,180 V2197" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<rect x="1735.0" y="2197" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="2231" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<text x="255.0" y="235" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">1. 提案：送信前に冪等キー</text>
+<text x="255.0" y="265" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">・入力識別情報を記録</text>
+<path d="M220.0,285 H500.0 V320 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="496.6666666666667" y="385" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. POST /jobs（Bearer・冪等キー・入力）</text>
+<path d="M220.0,405 H773.3333333333334" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1050.0" y="485" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. Sessions・Customersを照会</text>
+<path d="M773.3333333333334,505 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1050.0" y="585" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. 期限・失効・顧客有効状態</text>
+<path d="M1326.6666666666667,605 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="808.3333333333334" y="685" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">5. 認証・入力検証・custom</text>
+<text x="808.3333333333334" y="715" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">erId確定</text>
+<path d="M773.3333333333334,735 H1053.3333333333335 V770 H773.3333333333334" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1050.0" y="835" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. 顧客と冪等キーによる既存受付を確認</text>
+<path d="M773.3333333333334,855 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1050.0" y="935" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 既存受付の有無・入力ハッシュ</text>
+<path d="M1326.6666666666667,955 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<rect x="35" y="1020" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="1049" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">alt：同じキー・同じ入力の再送</text>
+<text x="496.6666666666667" y="1117" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 既存の同じjobIdを返す</text>
+<path d="M773.3333333333334,1137 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<path d="M35,1192 H2065" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="51" y="1223" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：同じキー・異なる入力</text>
+<text x="496.6666666666667" y="1291" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 409 Conflict（提案）</text>
+<path d="M773.3333333333334,1311 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<path d="M35,1366 H2065" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="51" y="1397" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：新しい受付</text>
+<text x="1326.6666666666667" y="1465" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">10. 提案：入力を不変な参照へ保存</text>
+<path d="M773.3333333333334,1485 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1326.6666666666667" y="1565" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">11. 保存成功・入力参照</text>
+<path d="M1880.0,1585 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="1050.0" y="1665" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">12. TransactWriteItemsで受付を原子的に</text>
+<text x="1050.0" y="1695" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">確定</text>
+<path d="M773.3333333333334,1715 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<rect x="613.3333333333334" y="1770" width="873.3333333333334" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1050.0" y="1800" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">冪等性の一意性・残量予約・Jobs・未配送Outbox</text>
+<text x="1050.0" y="1886" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">13. 全件コミット成功</text>
+<path d="M1326.6666666666667,1906 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="496.6666666666667" y="1986" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">14. 202 Accepted ＋ jobId</text>
+<path d="M773.3333333333334,2006 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<rect x="60.0" y="2096" width="1426.6666666666667" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="773.3333333333334" y="2126" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">202は永続受付完了。SQS送信・生成完了の保証ではない</text>
+<rect x="35" y="1020" width="2030" height="1046" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<text x="40" y="2281" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>

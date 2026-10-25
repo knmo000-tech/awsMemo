@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="2130" viewBox="0 0 2100 2130" role="img" aria-labelledby="title desc">
+<title id="title">3. 配送：Outboxの発送待ち記録をSQSへ届ける</title>
+<desc id="desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="2130" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">3. 配送：Outboxの発送待ち記録をSQSへ届ける</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V2030" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="75.0" y="2030" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="2064" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M1050.0,180 V2030" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="905.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">配送Event Function</text>
+<rect x="905.0" y="2030" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="2064" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">配送Event Function</text>
+<path d="M1880.0,180 V2030" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<rect x="1735.0" y="2030" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="2064" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<rect x="60.0" y="210" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="220.0" y="240" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">図2でJobsと未配送Outboxを</text>
+<text x="220.0" y="269" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">同時に保存済み</text>
+<text x="635.0" y="355" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. Streams連携でOutbox追加を通知</text>
+<path d="M220.0,375 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="635.0" y="455" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. 対象Outbox・配送状態を確認</text>
+<path d="M1050.0,475 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="635.0" y="555" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. eventId・jobId・customerId・未配送状態</text>
+<path d="M220.0,575 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="1465.0" y="655" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. SendMessage（jobId・customerId等）</text>
+<path d="M1050.0,675 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<rect x="890.0" y="730" width="1150.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1465.0" y="760" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">Fair Queues案ではMessageGroupId＝customerId</text>
+<rect x="35" y="831" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="860" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">alt：SQSが送信成功を返した</text>
+<text x="1465.0" y="928" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">5. 送信成功</text>
+<path d="M1880.0,948 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="635.0" y="1028" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. 条件付きでOutboxを配送済みに更新</text>
+<path d="M1050.0,1048 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="635.0" y="1128" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 更新成功</text>
+<path d="M220.0,1148 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<path d="M35,1203 H2065" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="51" y="1234" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：送信失敗・結果不明</text>
+<rect x="60.0" y="1277" width="1150.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="635.0" y="1307" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">配送済みにせず、再試行対象を残す</text>
+<rect x="35" y="1413" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="1442" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">opt：未配送が残った・Streams処理が長時間停止した</text>
+<text x="635.0" y="1510" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 回復起動時に未配送Outboxを検索</text>
+<path d="M1050.0,1530 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="635.0" y="1610" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 配送対象</text>
+<path d="M220.0,1630 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="1465.0" y="1710" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">10. 同じ配送意図を再送</text>
+<path d="M1050.0,1730 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1465.0" y="1810" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">11. 送信成功</text>
+<path d="M1880.0,1830 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="635.0" y="1910" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">12. 配送済み記録を更新</text>
+<path d="M1050.0,1930 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<rect x="35" y="831" width="2030" height="542" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<rect x="35" y="1413" width="2030" height="577" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<text x="40" y="2114" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>

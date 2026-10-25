@@ -2,7 +2,7 @@
 
 作成日：2026-10-26。既存の[業務フロー構成図](AWS構成図_WebFunctions_業務フロー.svg)に対応する。**比較・検証用で、Web入口・SQS・Outbox等の採用確定や実装完了を意味しない。**
 
-[構成図の読み方](AWS構成図_WebFunctions_業務フロー.md) / [入口方式比較](../current/入口方式比較.md) / [構成設計](../current/構成設計.md) / [図の一覧](README.md)
+[全6図をまとめたSVG](AWSシーケンス図_WebFunctions.svg) / [構成図の読み方](AWS構成図_WebFunctions_業務フロー.md) / [入口方式比較](../current/入口方式比較.md) / [構成設計](../current/構成設計.md) / [図の一覧](README.md)
 
 横幅を抑えるため、認証・受付・配送・生成・取得を分けて示す。各図は同じシステムの続きで、別の構成案ではない。図2〜4には、入力保存・Outbox・予約精算・試行別成果物等の既存の提案を含む。
 
@@ -15,7 +15,14 @@
 
 ## 1. 認証：不透明トークンを受け取る
 
-```mermaid
+[認証のSVGを開く](AWSシーケンス図_WebFunctions_01_認証.svg)
+
+![認証のシーケンス図](AWSシーケンス図_WebFunctions_01_認証.svg)
+
+<details>
+<summary>編集用Mermaidソース</summary>
+
+```text
 sequenceDiagram
     autonumber
     participant C as WPF
@@ -36,13 +43,22 @@ sequenceDiagram
     Note over C: 有効期限内はトークンを再利用
 ```
 
+</details>
+
 正常時の図。保守キー不正・停止顧客は認証を拒否する。OACの経路認証と顧客の認証は別。トークンの保存・期限・失効仕様は構成設計の提案に従う。
 
 ## 2. 受付：ジョブとOutboxをまとめて保存する
 
 図を読みやすくするため、この節だけCloudFrontを省略する。WPFとWeb間の要求・応答は、すべて図1と同じCloudFront・WAF・OAC経由。入力S3保存とOutbox・予約処理は提案。
 
-```mermaid
+[受付のSVGを開く](AWSシーケンス図_WebFunctions_02_受付.svg)
+
+![受付のシーケンス図](AWSシーケンス図_WebFunctions_02_受付.svg)
+
+<details>
+<summary>編集用Mermaidソース</summary>
+
+```text
 sequenceDiagram
     autonumber
     participant C as WPF
@@ -71,11 +87,20 @@ sequenceDiagram
     Note over C,D: 202は永続受付完了。SQS送信・生成完了の保証ではない
 ```
 
+</details>
+
 事前の冪等性照会だけでは並列再送を防げない。新規登録時にも条件付き書込みを行い、競合時は既存レコードを読み直して同じjobIdへ収束させる。残量不足等でトランザクションが失敗した場合は202を返さない。入力保存後に受付が失敗すると孤立オブジェクトが残るため清掃を設計する。
 
 ## 3. 配送：Outboxの発送待ち記録をSQSへ届ける
 
-```mermaid
+[Outbox配送のSVGを開く](AWSシーケンス図_WebFunctions_03_Outbox配送.svg)
+
+![Outbox配送のシーケンス図](AWSシーケンス図_WebFunctions_03_Outbox配送.svg)
+
+<details>
+<summary>編集用Mermaidソース</summary>
+
+```text
 sequenceDiagram
     autonumber
     participant D as DynamoDB
@@ -103,13 +128,22 @@ sequenceDiagram
     end
 ```
 
+</details>
+
 **Outboxは「発送予定」、SQSは「Workerが実行するのを待つ場所」。配送済みは生成済みを意味しない。** Streams連携に加え、回復処理の起動方式・検索キー・再試行上限は詳細設計で決める。図では回復処理を配送担当にまとめており、別の起動機構や専用処理の採否は確定していない。
 
 図2の202応答と、図3の配送開始の前後関係は固定ではない。DynamoDB確定後は独立して進み、WPFが202を受信する前に配送が始まることもある。
 
 ## 4. 生成：WorkerがBedrockを呼び、結果を確定する
 
-```mermaid
+[生成のSVGを開く](AWSシーケンス図_WebFunctions_04_生成.svg)
+
+![生成のシーケンス図](AWSシーケンス図_WebFunctions_04_生成.svg)
+
+<details>
+<summary>編集用Mermaidソース</summary>
+
+```text
 sequenceDiagram
     autonumber
     participant Q as SQS
@@ -142,11 +176,20 @@ sequenceDiagram
     Note over Q,W: 正常終了した対象メッセージを連携が削除。再試行対象は残す
 ```
 
+</details>
+
 この図は成功経路中心。推論の結果不明・検証失敗・古いattemptIdの確定拒否・請求訂正は[構成設計の復旧表](../current/構成設計.md)で扱う。実行中の重複を無条件に完了扱いせず、リース期限後の回復を含めて決める。部分バッチ応答を使う場合も、削除対象と再試行対象を分ける。
 
 ## 5. 照会・取得：完了を確認してS3からダウンロードする
 
-```mermaid
+[照会と取得のSVGを開く](AWSシーケンス図_WebFunctions_05_照会と取得.svg)
+
+![照会と取得のシーケンス図](AWSシーケンス図_WebFunctions_05_照会と取得.svg)
+
+<details>
+<summary>編集用Mermaidソース</summary>
+
+```text
 sequenceDiagram
     autonumber
     participant C as WPF
@@ -180,11 +223,20 @@ sequenceDiagram
     Note over C,S: この取得はCloudFront・APIのWAFを通らない
 ```
 
+</details>
+
 成功・失敗を受けたらポーリングを終了する。無効トークンは認証エラーとして扱い、未認証・所有者不一致にはジョブ情報やURLを返さない。署名URLはWebが署名計算して作るため、URL発行だけのためにS3へHTTP要求は送らない。URL期限切れは、再認証・所有者確認を経て再発行し、再推論しない。既発行URLはセッション失効だけでは無効にならない。
 
 ## 6. Outboxが回復する代表例：SQS送信後に配送係が停止した
 
-```mermaid
+[配送回復のSVGを開く](AWSシーケンス図_WebFunctions_06_配送回復.svg)
+
+![配送回復のシーケンス図](AWSシーケンス図_WebFunctions_06_配送回復.svg)
+
+<details>
+<summary>編集用Mermaidソース</summary>
+
+```text
 sequenceDiagram
     autonumber
     participant D as DynamoDB
@@ -208,6 +260,8 @@ sequenceDiagram
     D-->>W: 実行中または成功済み
     Note over W: 追加推論・二重請求を防ぎ、状態に応じて処理
 ```
+
+</details>
 
 Outboxは「1回だけ送る」仕組みではなく、**配送意図を失わず、必要なら再送する**仕組み。重複への対策はWorker側にも必要になる。DB確定後・SQS送信前の停止も、未配送Outboxから回復する。
 

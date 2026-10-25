@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1631" viewBox="0 0 2100 1631" role="img" aria-labelledby="title desc">
+<title id="title">1. 認証：不透明トークンを受け取る</title>
+<desc id="desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="1631" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">1. 認証：不透明トークンを受け取る</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V1531" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<rect x="75.0" y="1531" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="1565" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<path d="M773.3333333333334,180 V1531" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="628.3333333333334" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">CloudFront</text>
+<rect x="628.3333333333334" y="1531" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="1565" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">CloudFront</text>
+<path d="M1326.6666666666667,180 V1531" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1181.6666666666667" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<rect x="1181.6666666666667" y="1531" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="1565" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<path d="M1880.0,180 V1531" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="1735.0" y="1531" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="1565" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<text x="496.6666666666667" y="235" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. POST /auth（保守キー・顧客名）</text>
+<path d="M220.0,255 H773.3333333333334" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<rect x="613.3333333333334" y="310" width="320.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="773.3333333333334" y="340" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">関連付けたWAFで検査</text>
+<text x="1050.0" y="426" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. OAC署名を付けて転送</text>
+<path d="M773.3333333333334,446 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<rect x="1166.6666666666667" y="501" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1326.6666666666667" y="531" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">endpointはIamAuthで経路</text>
+<text x="1326.6666666666667" y="560" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">を確認</text>
+<text x="1603.3333333333335" y="646" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. Customersの照合・顧客有効状態の取得</text>
+<path d="M1326.6666666666667,666 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1603.3333333333335" y="746" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. 顧客情報・検証材料</text>
+<path d="M1880.0,766 H1326.6666666666667" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="1361.6666666666667" y="846" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">5. 保守キーを検証し、乱数</text>
+<text x="1361.6666666666667" y="876" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">トークンを生成</text>
+<path d="M1326.6666666666667,896 H1606.6666666666667 V931 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1603.3333333333335" y="996" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. Sessionsにトークンのハッシュ・期限等を</text>
+<text x="1603.3333333333335" y="1026" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">保存</text>
+<path d="M1326.6666666666667,1046 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1603.3333333333335" y="1126" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 保存成功</text>
+<path d="M1880.0,1146 H1326.6666666666667" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="1050.0" y="1226" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 不透明トークン・有効期限</text>
+<path d="M1326.6666666666667,1246 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="496.6666666666667" y="1326" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 認証応答（キャッシュしない）</text>
+<path d="M773.3333333333334,1346 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<rect x="60.0" y="1401" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="220.0" y="1431" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">有効期限内はトークンを再利</text>
+<text x="220.0" y="1460" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">用</text>
+<text x="40" y="1615" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>

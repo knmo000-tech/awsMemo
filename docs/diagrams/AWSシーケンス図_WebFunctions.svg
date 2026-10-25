@@ -1,0 +1,443 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="13602" viewBox="0 0 2100 13602">
+<title>Web Functions案・全6シーケンス図</title>
+<rect width="100%" height="100%" fill="#e5edf5"/>
+<g transform="translate(0,0)"><svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1631" viewBox="0 0 2100 1631" role="img" aria-labelledby="p0_title p0_desc">
+<title id="p0_title">1. 認証：不透明トークンを受け取る</title>
+<desc id="p0_desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="p0_request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="p0_reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="1631" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">1. 認証：不透明トークンを受け取る</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V1531" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<rect x="75.0" y="1531" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="1565" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<path d="M773.3333333333334,180 V1531" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="628.3333333333334" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">CloudFront</text>
+<rect x="628.3333333333334" y="1531" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="1565" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">CloudFront</text>
+<path d="M1326.6666666666667,180 V1531" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1181.6666666666667" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<rect x="1181.6666666666667" y="1531" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="1565" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<path d="M1880.0,180 V1531" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="1735.0" y="1531" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="1565" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<text x="496.6666666666667" y="235" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. POST /auth（保守キー・顧客名）</text>
+<path d="M220.0,255 H773.3333333333334" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p0_request)"/>
+<rect x="613.3333333333334" y="310" width="320.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="773.3333333333334" y="340" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">関連付けたWAFで検査</text>
+<text x="1050.0" y="426" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. OAC署名を付けて転送</text>
+<path d="M773.3333333333334,446 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p0_request)"/>
+<rect x="1166.6666666666667" y="501" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1326.6666666666667" y="531" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">endpointはIamAuthで経路</text>
+<text x="1326.6666666666667" y="560" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">を確認</text>
+<text x="1603.3333333333335" y="646" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. Customersの照合・顧客有効状態の取得</text>
+<path d="M1326.6666666666667,666 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p0_request)"/>
+<text x="1603.3333333333335" y="746" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. 顧客情報・検証材料</text>
+<path d="M1880.0,766 H1326.6666666666667" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p0_reply)"/>
+<text x="1361.6666666666667" y="846" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">5. 保守キーを検証し、乱数</text>
+<text x="1361.6666666666667" y="876" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">トークンを生成</text>
+<path d="M1326.6666666666667,896 H1606.6666666666667 V931 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p0_request)"/>
+<text x="1603.3333333333335" y="996" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. Sessionsにトークンのハッシュ・期限等を</text>
+<text x="1603.3333333333335" y="1026" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">保存</text>
+<path d="M1326.6666666666667,1046 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p0_request)"/>
+<text x="1603.3333333333335" y="1126" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 保存成功</text>
+<path d="M1880.0,1146 H1326.6666666666667" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p0_reply)"/>
+<text x="1050.0" y="1226" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 不透明トークン・有効期限</text>
+<path d="M1326.6666666666667,1246 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p0_reply)"/>
+<text x="496.6666666666667" y="1326" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 認証応答（キャッシュしない）</text>
+<path d="M773.3333333333334,1346 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p0_reply)"/>
+<rect x="60.0" y="1401" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="220.0" y="1431" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">有効期限内はトークンを再利</text>
+<text x="220.0" y="1460" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">用</text>
+<text x="40" y="1615" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>
+</g>
+<g transform="translate(0,1671)"><svg xmlns="http://www.w3.org/2000/svg" width="2100" height="2297" viewBox="0 0 2100 2297" role="img" aria-labelledby="p1_title p1_desc">
+<title id="p1_title">2. 受付：ジョブとOutboxをまとめて保存する</title>
+<desc id="p1_desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="p1_request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="p1_reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="2297" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">2. 受付：ジョブとOutboxをまとめて保存する</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V2197" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<rect x="75.0" y="2197" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="2231" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<path d="M773.3333333333334,180 V2197" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="628.3333333333334" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<rect x="628.3333333333334" y="2197" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="2231" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<path d="M1326.6666666666667,180 V2197" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1181.6666666666667" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="1181.6666666666667" y="2197" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="2231" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M1880.0,180 V2197" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<rect x="1735.0" y="2197" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="2231" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<text x="255.0" y="235" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">1. 提案：送信前に冪等キー</text>
+<text x="255.0" y="265" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">・入力識別情報を記録</text>
+<path d="M220.0,285 H500.0 V320 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p1_request)"/>
+<text x="496.6666666666667" y="385" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. POST /jobs（Bearer・冪等キー・入力）</text>
+<path d="M220.0,405 H773.3333333333334" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p1_request)"/>
+<text x="1050.0" y="485" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. Sessions・Customersを照会</text>
+<path d="M773.3333333333334,505 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p1_request)"/>
+<text x="1050.0" y="585" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. 期限・失効・顧客有効状態</text>
+<path d="M1326.6666666666667,605 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p1_reply)"/>
+<text x="808.3333333333334" y="685" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">5. 認証・入力検証・custom</text>
+<text x="808.3333333333334" y="715" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">erId確定</text>
+<path d="M773.3333333333334,735 H1053.3333333333335 V770 H773.3333333333334" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p1_request)"/>
+<text x="1050.0" y="835" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. 顧客と冪等キーによる既存受付を確認</text>
+<path d="M773.3333333333334,855 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p1_request)"/>
+<text x="1050.0" y="935" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 既存受付の有無・入力ハッシュ</text>
+<path d="M1326.6666666666667,955 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p1_reply)"/>
+<rect x="35" y="1020" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="1049" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">alt：同じキー・同じ入力の再送</text>
+<text x="496.6666666666667" y="1117" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 既存の同じjobIdを返す</text>
+<path d="M773.3333333333334,1137 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p1_reply)"/>
+<path d="M35,1192 H2065" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="51" y="1223" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：同じキー・異なる入力</text>
+<text x="496.6666666666667" y="1291" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 409 Conflict（提案）</text>
+<path d="M773.3333333333334,1311 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p1_reply)"/>
+<path d="M35,1366 H2065" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="51" y="1397" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：新しい受付</text>
+<text x="1326.6666666666667" y="1465" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">10. 提案：入力を不変な参照へ保存</text>
+<path d="M773.3333333333334,1485 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p1_request)"/>
+<text x="1326.6666666666667" y="1565" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">11. 保存成功・入力参照</text>
+<path d="M1880.0,1585 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p1_reply)"/>
+<text x="1050.0" y="1665" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">12. TransactWriteItemsで受付を原子的に</text>
+<text x="1050.0" y="1695" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">確定</text>
+<path d="M773.3333333333334,1715 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p1_request)"/>
+<rect x="613.3333333333334" y="1770" width="873.3333333333334" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1050.0" y="1800" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">冪等性の一意性・残量予約・Jobs・未配送Outbox</text>
+<text x="1050.0" y="1886" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">13. 全件コミット成功</text>
+<path d="M1326.6666666666667,1906 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p1_reply)"/>
+<text x="496.6666666666667" y="1986" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">14. 202 Accepted ＋ jobId</text>
+<path d="M773.3333333333334,2006 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p1_reply)"/>
+<rect x="60.0" y="2096" width="1426.6666666666667" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="773.3333333333334" y="2126" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">202は永続受付完了。SQS送信・生成完了の保証ではない</text>
+<rect x="35" y="1020" width="2030" height="1046" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<text x="40" y="2281" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>
+</g>
+<g transform="translate(0,4008)"><svg xmlns="http://www.w3.org/2000/svg" width="2100" height="2130" viewBox="0 0 2100 2130" role="img" aria-labelledby="p2_title p2_desc">
+<title id="p2_title">3. 配送：Outboxの発送待ち記録をSQSへ届ける</title>
+<desc id="p2_desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="p2_request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="p2_reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="2130" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">3. 配送：Outboxの発送待ち記録をSQSへ届ける</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V2030" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="75.0" y="2030" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="2064" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M1050.0,180 V2030" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="905.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">配送Event Function</text>
+<rect x="905.0" y="2030" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="2064" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">配送Event Function</text>
+<path d="M1880.0,180 V2030" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<rect x="1735.0" y="2030" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="2064" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<rect x="60.0" y="210" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="220.0" y="240" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">図2でJobsと未配送Outboxを</text>
+<text x="220.0" y="269" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">同時に保存済み</text>
+<text x="635.0" y="355" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. Streams連携でOutbox追加を通知</text>
+<path d="M220.0,375 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p2_reply)"/>
+<text x="635.0" y="455" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. 対象Outbox・配送状態を確認</text>
+<path d="M1050.0,475 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p2_request)"/>
+<text x="635.0" y="555" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. eventId・jobId・customerId・未配送状態</text>
+<path d="M220.0,575 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p2_reply)"/>
+<text x="1465.0" y="655" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. SendMessage（jobId・customerId等）</text>
+<path d="M1050.0,675 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p2_request)"/>
+<rect x="890.0" y="730" width="1150.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1465.0" y="760" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">Fair Queues案ではMessageGroupId＝customerId</text>
+<rect x="35" y="831" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="860" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">alt：SQSが送信成功を返した</text>
+<text x="1465.0" y="928" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">5. 送信成功</text>
+<path d="M1880.0,948 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p2_reply)"/>
+<text x="635.0" y="1028" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. 条件付きでOutboxを配送済みに更新</text>
+<path d="M1050.0,1048 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p2_request)"/>
+<text x="635.0" y="1128" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 更新成功</text>
+<path d="M220.0,1148 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p2_reply)"/>
+<path d="M35,1203 H2065" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="51" y="1234" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：送信失敗・結果不明</text>
+<rect x="60.0" y="1277" width="1150.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="635.0" y="1307" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">配送済みにせず、再試行対象を残す</text>
+<rect x="35" y="1413" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="1442" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">opt：未配送が残った・Streams処理が長時間停止した</text>
+<text x="635.0" y="1510" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 回復起動時に未配送Outboxを検索</text>
+<path d="M1050.0,1530 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p2_request)"/>
+<text x="635.0" y="1610" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 配送対象</text>
+<path d="M220.0,1630 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p2_reply)"/>
+<text x="1465.0" y="1710" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">10. 同じ配送意図を再送</text>
+<path d="M1050.0,1730 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p2_request)"/>
+<text x="1465.0" y="1810" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">11. 送信成功</text>
+<path d="M1880.0,1830 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p2_reply)"/>
+<text x="635.0" y="1910" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">12. 配送済み記録を更新</text>
+<path d="M1050.0,1930 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p2_request)"/>
+<rect x="35" y="831" width="2030" height="542" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<rect x="35" y="1413" width="2030" height="577" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<text x="40" y="2114" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>
+</g>
+<g transform="translate(0,6178)"><svg xmlns="http://www.w3.org/2000/svg" width="2100" height="2669" viewBox="0 0 2100 2669" role="img" aria-labelledby="p3_title p3_desc">
+<title id="p3_title">4. 生成：WorkerがBedrockを呼び、結果を確定する</title>
+<desc id="p3_desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="p3_request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="p3_reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="2669" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">4. 生成：WorkerがBedrockを呼び、結果を確定する</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V2569" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<rect x="75.0" y="2569" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="2603" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<path d="M635.0,180 V2569" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="490.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="635.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">生成Worker</text>
+<rect x="490.0" y="2569" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="635.0" y="2603" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">生成Worker</text>
+<path d="M1050.0,180 V2569" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="905.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="905.0" y="2569" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="2603" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M1465.0,180 V2569" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1320.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1465.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Bedrock</text>
+<rect x="1320.0" y="2569" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1465.0" y="2603" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Bedrock</text>
+<path d="M1880.0,180 V2569" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<rect x="1735.0" y="2569" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="2603" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<rect x="60.0" y="210" width="735.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="427.5" y="240" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">Lambdaのイベントソース連携が受信・Worker呼出しを行う</text>
+<text x="427.5" y="326" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. jobId・customerIdを配送</text>
+<text x="427.5" y="356" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">（重複し得る）</text>
+<path d="M220.0,376 H635.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p3_request)"/>
+<text x="842.5" y="456" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. ジョブ状態確認・条件付き実</text>
+<text x="842.5" y="486" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">行権取得</text>
+<path d="M635.0,506 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p3_request)"/>
+<text x="842.5" y="586" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. 入力参照・attemptId・リー</text>
+<text x="842.5" y="616" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">ス</text>
+<path d="M1050.0,636 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p3_reply)"/>
+<rect x="35" y="701" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="730" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">alt：既に成功済み</text>
+<rect x="475.0" y="773" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="635.0" y="803" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">再推論・二重請求せず正常終</text>
+<text x="635.0" y="832" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">了</text>
+<path d="M35,893 H2065" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="51" y="924" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：実行権を取得できた</text>
+<text x="1257.5" y="992" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. 入力を取得</text>
+<path d="M635.0,1012 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p3_request)"/>
+<text x="1257.5" y="1092" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">5. 保存済み入力</text>
+<path d="M1880.0,1112 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p3_reply)"/>
+<text x="1050.0" y="1192" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. 推論要求</text>
+<path d="M635.0,1212 H1465.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p3_request)"/>
+<text x="1050.0" y="1292" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 生成結果・実使用量</text>
+<path d="M1465.0,1312 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p3_reply)"/>
+<text x="842.5" y="1392" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. attemptIdで試行別使用量を</text>
+<text x="842.5" y="1422" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">一意に記録</text>
+<path d="M635.0,1442 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p3_request)"/>
+<text x="842.5" y="1522" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 記録成功</text>
+<path d="M1050.0,1542 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p3_reply)"/>
+<text x="670.0" y="1622" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">10. JSON構文・Schema等を</text>
+<text x="670.0" y="1652" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">検証</text>
+<path d="M635.0,1672 H915.0 V1707 H635.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p3_request)"/>
+<text x="1257.5" y="1772" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">11. 提案：試行別キーへ検証済み結果を保存</text>
+<path d="M635.0,1792 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p3_request)"/>
+<text x="1257.5" y="1872" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">12. 結果参照</text>
+<path d="M1880.0,1892 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p3_reply)"/>
+<text x="842.5" y="1972" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">13. 現行attemptIdを条件に成</text>
+<text x="842.5" y="2002" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">功確定・精算</text>
+<path d="M635.0,2022 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p3_request)"/>
+<rect x="475.0" y="2077" width="735.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="842.5" y="2107" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">採用結果参照・SUCCEEDED・請求一意性・残量精算</text>
+<text x="842.5" y="2193" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">14. 確定成功</text>
+<path d="M1050.0,2213 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p3_reply)"/>
+<path d="M35,2268 H2065" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="51" y="2299" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：他のWorkerが実行中・実行条件を満たさない</text>
+<rect x="475.0" y="2342" width="735.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="842.5" y="2372" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">再試行・リース・停止ルールで扱う。追加推論しない</text>
+<rect x="60.0" y="2468" width="735.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="427.5" y="2498" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">正常終了した対象メッセージを連携が削除。再試行対象は残す</text>
+<rect x="35" y="701" width="2030" height="1737" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<text x="40" y="2653" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>
+</g>
+<g transform="translate(0,8887)"><svg xmlns="http://www.w3.org/2000/svg" width="2100" height="2733" viewBox="0 0 2100 2733" role="img" aria-labelledby="p4_title p4_desc">
+<title id="p4_title">5. 照会・取得：完了を確認してS3からダウンロードする</title>
+<desc id="p4_desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="p4_request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="p4_reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="2733" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">5. 照会・取得：完了を確認してS3からダウンロードする</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V2633" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<rect x="75.0" y="2633" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="2667" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<path d="M635.0,180 V2633" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="490.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="635.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">CloudFront</text>
+<rect x="490.0" y="2633" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="635.0" y="2667" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">CloudFront</text>
+<path d="M1050.0,180 V2633" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="905.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<rect x="905.0" y="2633" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="2667" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<path d="M1465.0,180 V2633" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1320.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1465.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="1320.0" y="2633" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1465.0" y="2667" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M1880.0,180 V2633" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<rect x="1735.0" y="2633" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="2667" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<rect x="35" y="220" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="249" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">loop：生成中はバックオフしてポーリング</text>
+<text x="427.5" y="317" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. GET /jobs/{jobId}（Bear</text>
+<text x="427.5" y="347" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">er）</text>
+<path d="M220.0,367 H635.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p4_request)"/>
+<rect x="475.0" y="422" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="635.0" y="452" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">WAF検査・API応答をキャッシ</text>
+<text x="635.0" y="481" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">ュしない</text>
+<text x="842.5" y="567" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. OAC署名・Bearerを保持して</text>
+<text x="842.5" y="597" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">転送</text>
+<path d="M635.0,617 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p4_request)"/>
+<text x="1257.5" y="697" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. Sessions・Customersを照</text>
+<text x="1257.5" y="727" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">会</text>
+<path d="M1050.0,747 H1465.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p4_request)"/>
+<text x="1257.5" y="827" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. 認証・顧客状態</text>
+<path d="M1465.0,847 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<text x="1257.5" y="927" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">5. Jobsの状態・所有者・結果参</text>
+<text x="1257.5" y="957" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">照を取得</text>
+<path d="M1050.0,977 H1465.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p4_request)"/>
+<text x="1257.5" y="1057" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. ジョブ情報</text>
+<path d="M1465.0,1077 H1050.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<text x="1085.0" y="1157" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">7. customerIdとジョブ所有</text>
+<text x="1085.0" y="1187" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">者を照合</text>
+<path d="M1050.0,1207 H1330.0 V1242 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p4_request)"/>
+<rect x="53" y="1292" width="1994" height="50" fill="#e9f1f9"/>
+<text x="69" y="1321" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">alt：QUEUEDまたはRUNNING</text>
+<text x="842.5" y="1389" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 現在の状態</text>
+<path d="M1050.0,1409 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<text x="427.5" y="1489" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 状態を返す</text>
+<path d="M635.0,1509 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<path d="M53,1564 H2047" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="69" y="1595" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：SUCCEEDED</text>
+<text x="1085.0" y="1663" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">10. 採用結果のS3署名URLを</text>
+<text x="1085.0" y="1693" text-anchor="start" font-size="22" fill="#244b6e" font-weight="400">生成</text>
+<path d="M1050.0,1713 H1330.0 V1748 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p4_request)"/>
+<text x="842.5" y="1813" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">11. 成功状態・短命な署名URL</text>
+<path d="M1050.0,1833 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<text x="427.5" y="1913" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">12. 成功応答</text>
+<path d="M635.0,1933 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<path d="M53,1988 H2047" stroke="#a0b3c3" stroke-dasharray="7 5"/>
+<text x="69" y="2019" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">else：FAILED</text>
+<text x="842.5" y="2087" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">13. 失敗状態・公開可能な理由</text>
+<path d="M1050.0,2107 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<text x="427.5" y="2187" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">14. 失敗応答</text>
+<path d="M635.0,2207 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<text x="1050.0" y="2357" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">15. 成功時：署名URLでJSONを取得</text>
+<path d="M220.0,2377 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p4_request)"/>
+<text x="1050.0" y="2457" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">16. JSON</text>
+<path d="M1880.0,2477 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p4_reply)"/>
+<rect x="60.0" y="2532" width="1980.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1050.0" y="2562" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">この取得はCloudFront・APIのWAFを通らない</text>
+<rect x="53" y="1292" width="1994" height="975" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<rect x="35" y="220" width="2030" height="2082" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<text x="40" y="2717" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>
+</g>
+<g transform="translate(0,11660)"><svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1942" viewBox="0 0 2100 1942" role="img" aria-labelledby="p5_title p5_desc">
+<title id="p5_title">6. Outboxが回復する代表例：SQS送信後に配送係が停止した</title>
+<desc id="p5_desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="p5_request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="p5_reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="1942" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">6. Outboxが回復する代表例：SQS送信後に配送係が停止した</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions構成・比較検証用  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V1842" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="75.0" y="1842" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="1876" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M773.3333333333334,180 V1842" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="628.3333333333334" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">配送Event Function</text>
+<rect x="628.3333333333334" y="1842" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="773.3333333333334" y="1876" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">配送Event Function</text>
+<path d="M1326.6666666666667,180 V1842" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1181.6666666666667" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<rect x="1181.6666666666667" y="1842" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1326.6666666666667" y="1876" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<path d="M1880.0,180 V1842" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">生成Worker</text>
+<rect x="1735.0" y="1842" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="1876" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">生成Worker</text>
+<text x="1050.0" y="235" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. jobIdを送信</text>
+<path d="M773.3333333333334,255 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p5_request)"/>
+<text x="1050.0" y="335" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. 送信成功</text>
+<path d="M1326.6666666666667,355 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p5_reply)"/>
+<rect x="613.3333333333334" y="410" width="320.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="773.3333333333334" y="440" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">配送済み更新前に停止</text>
+<rect x="60.0" y="501" width="320.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="220.0" y="531" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">Outboxには未配送記録が残る</text>
+<text x="1603.3333333333335" y="617" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. 最初のメッセージを配送</text>
+<path d="M1326.6666666666667,637 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p5_request)"/>
+<text x="1050.0" y="717" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. 条件付きで実行権取得</text>
+<path d="M1880.0,737 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p5_request)"/>
+<rect x="1720.0" y="792" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1880.0" y="822" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">実行権取得後、図4の生成処</text>
+<text x="1880.0" y="851" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">理へ進む</text>
+<text x="496.6666666666667" y="937" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">5. 再試行・回復で未配送記録を取得</text>
+<path d="M773.3333333333334,957 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p5_request)"/>
+<text x="496.6666666666667" y="1037" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. 同じjobId</text>
+<path d="M220.0,1057 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p5_reply)"/>
+<text x="1050.0" y="1137" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 同じjobIdを再送</text>
+<path d="M773.3333333333334,1157 H1326.6666666666667" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p5_request)"/>
+<text x="1050.0" y="1237" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 送信成功</text>
+<path d="M1326.6666666666667,1257 H773.3333333333334" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p5_reply)"/>
+<text x="496.6666666666667" y="1337" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 配送済みに更新</text>
+<path d="M773.3333333333334,1357 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p5_request)"/>
+<text x="1603.3333333333335" y="1437" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">10. 重複メッセージを配送</text>
+<path d="M1326.6666666666667,1457 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p5_request)"/>
+<text x="1050.0" y="1537" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">11. 同じjobIdの状態・実行権を確認</text>
+<path d="M1880.0,1557 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#p5_request)"/>
+<text x="1050.0" y="1637" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">12. 実行中または成功済み</text>
+<path d="M220.0,1657 H1880.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#p5_reply)"/>
+<rect x="1720.0" y="1712" width="320.0" height="92" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1880.0" y="1742" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">追加推論・二重請求を防ぎ、</text>
+<text x="1880.0" y="1771" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">状態に応じて処理</text>
+<text x="40" y="1926" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  詳細・未決事項は同名のMarkdownを参照</text>
+</g></svg>
+</g>
+</svg>
