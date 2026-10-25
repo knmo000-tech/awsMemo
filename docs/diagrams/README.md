@@ -23,3 +23,7 @@ AWSサービスアイコン：[AWS Architecture Icons](https://aws.amazon.com/ar
 
 **rev4はSQSを介さない直接非同期Invoke方式の履歴図。** SQS Standard Fair Queuesは今回「追加を推奨する検討候補」であり、rev4のSVG/draw.ioには未反映。提案構成の最新概念図は[構成設計（Mermaid）](../構成設計.md)と[API方式・SQS比較試算](../比較検討/2026-10-19_非同期Bedrock基盤とAPI方式の比較.md)を参照。
 
+
+## 2026-10-25：不透明トークン・入口方式の比較図
+
+[REST API案とWeb Functions案の全体構成図](../比較検討/2026-10-25_REST-APIとWeb-Functionsの構成比較.md)に両案のMermaid図を掲載。SQS・Outbox・Worker・データ管理を揃え、入口の違いを比較する。既存SVG／draw.ioは履歴として維持する。
