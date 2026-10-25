@@ -6,7 +6,7 @@
 
 ### Web Functions案：業務処理・データの流れ
 
-[SVGを開く](AWS構成図_WebFunctions_業務フロー.svg) / [読み方・設定・処理順](AWS構成図_WebFunctions_業務フロー.md)
+[SVGを開く](AWS構成図_WebFunctions_業務フロー.svg) / [シーケンス図](AWSシーケンス図_WebFunctions.md) / [読み方・設定・処理順](AWS構成図_WebFunctions_業務フロー.md)
 
 ![Web Functions案の業務フロー](AWS構成図_WebFunctions_業務フロー.svg)
 
