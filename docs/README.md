@@ -41,7 +41,7 @@
 | [adr/](adr/README.md) | 判断理由と変更履歴 | 現在の適用範囲を冒頭・一覧で確認 |
 | [archive/](archive/README.md) | 過去の設計と履歴への案内 | JWT・直接Invoke等は当時の記述 |
 | [比較検討/](比較検討/README.md) | 過去の方式・料金比較 | 料金・前提は作成当時。現在の見積もりではない |
-| [diagrams/](diagrams/README.md) | 旧SVG・draw.io | rev4までの図は最新の構成図ではない |
+| [diagrams/](diagrams/README.md) | Web案の業務フローSVG・旧図 | Web案は現行前提の比較用。rev4までの図は履歴 |
 | [reviews/](reviews/README.md) | 過去のレビュー | 未解決の論点は現在の決定事項一覧で確認 |
 | [learning/](learning/README.md) | 学習ノートと料金シミュレーター | 最新設計・最新料金の正本ではない |
 

@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2720" height="1840" viewBox="0 0 2720 1840" role="img" aria-labelledby="title desc">
+<title id="title">AWS Web Functions案：業務処理とデータの流れ</title><desc id="desc">WPFからCloudFrontとWAF、OAC経由でWeb Functionに接続。不透明トークンとDynamoDBで認証。提案のOutbox、配送Event Function、SQSから生成Workerを実行し、BedrockのJSONをS3へ保存する。</desc>
+<defs>
+<marker id="blue" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker>
+<marker id="purple" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker>
+<marker id="red" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#bc5960"/></marker>
+<marker id="gray" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#8496a6"/></marker>
+</defs><rect width="2720" height="1840" fill="#fff"/><g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="50" y="66" font-size="36" fill="#244b6e" font-weight="700">AWS Bedrock 非同期API  /  Web Functions案・業務フロー</text>
+<text x="50" y="108" font-size="21" fill="#6b8195" font-weight="400">比較・検証用の構成案  |  不透明トークン前提  |  2026-10-26  |  採用・構築完了を意味しない</text>
+<rect x="35" y="150" width="330" height="1280" rx="14" fill="#f8fbff" stroke="#a6bdd4" stroke-width="2" stroke-dasharray="9 6"/>
+<text x="60" y="190" font-size="26" fill="#244b6e" font-weight="700">顧客企業</text>
+<text x="60" y="221" font-size="18" fill="#244b6e" font-weight="400">AWS外 / 約100社を想定</text>
+<rect x="395" y="150" width="2290" height="1280" rx="14" fill="#f8fbff" stroke="#a6bdd4" stroke-width="2" stroke-dasharray="9 6"/>
+<text x="420" y="190" font-size="26" fill="#244b6e" font-weight="700">AWS Cloud</text>
+<text x="420" y="221" font-size="19" fill="#244b6e" font-weight="400">公開入口：CloudFront  /  API・非同期処理：単一リージョンを初期案とする</text>
+<polyline points="335,460 450,460" fill="none" stroke="#427a9e" stroke-width="3" marker-end="url(#blue)"/>
+<polyline points="830,460 1070,460" fill="none" stroke="#427a9e" stroke-width="3" marker-end="url(#blue)"/>
+<polyline points="1070,610 950,610 950,550 830,550" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<polyline points="450,550 390,550 390,650 335,650" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<polyline points="640,380 640,335" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<polyline points="1280,680 1280,760" fill="none" stroke="#427a9e" stroke-width="3" marker-end="url(#blue)" marker-start="url(#blue)"/>
+<polyline points="1510,520 2660,520 2660,1250 2625,1250" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<polyline points="205,565 205,1380 2570,1380 2570,1340" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<rect x="65" y="360" width="270" height="205" rx="14" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="87" y="398" font-size="24" fill="#244b6e" font-weight="700">WPF Client</text>
+<text x="87" y="437" font-size="19" fill="#244b6e" font-weight="400">.NET Framework 4.8</text>
+<text x="87" y="466" font-size="19" fill="#244b6e" font-weight="400">保守キーで /auth</text>
+<text x="87" y="495" font-size="19" fill="#244b6e" font-weight="400">Bearer不透明トークン</text>
+<text x="87" y="524" font-size="19" fill="#244b6e" font-weight="400">冪等キー・ポーリング</text>
+<rect x="450" y="250" width="380" height="85" rx="14" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="472" y="288" font-size="24" fill="#244b6e" font-weight="700">AWS WAF</text>
+<text x="472" y="315" font-size="18" fill="#244b6e" font-weight="400">CloudFrontにWeb ACLを関連付け</text>
+<rect x="450" y="380" width="380" height="205" rx="14" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="472" y="418" font-size="24" fill="#244b6e" font-weight="700">Amazon CloudFront</text>
+<text x="472" y="457" font-size="19" fill="#244b6e" font-weight="400">HTTPSの公開入口</text>
+<text x="472" y="486" font-size="19" fill="#244b6e" font-weight="400">APIキャッシュ：全TTL＝0</text>
+<text x="472" y="515" font-size="19" fill="#244b6e" font-weight="400">Authorization・冪等キー転送</text>
+<text x="472" y="544" font-size="19" fill="#244b6e" font-weight="400">X-Amz-Cf-Idを自動付与</text>
+<rect x="1070" y="290" width="440" height="390" rx="14" fill="#fff5e9" stroke="#e3b16f" stroke-width="2"/>
+<text x="1092" y="328" font-size="24" fill="#244b6e" font-weight="700">Lambda Web Function</text>
+<text x="1092" y="367" font-size="19" fill="#244b6e" font-weight="400">① POST /auth：顧客照合・発行</text>
+<text x="1092" y="396" font-size="19" fill="#244b6e" font-weight="400">② POST /jobs：検証・永続受付</text>
+<text x="1092" y="425" font-size="19" fill="#244b6e" font-weight="400">③ GET /jobs/{jobId}：状態照会</text>
+<text x="1092" y="454" font-size="19" fill="#244b6e" font-weight="400">顧客・ジョブ所有者を認可</text>
+<text x="1092" y="483" font-size="19" fill="#244b6e" font-weight="400">成功時：結果のS3署名URLを返す</text>
+<text x="1092" y="512" font-size="19" fill="#244b6e" font-weight="400">Node.js / Hono・Express等</text>
+<text x="1092" y="541" font-size="19" fill="#244b6e" font-weight="400">endpoint：IamAuth</text>
+<text x="1092" y="570" font-size="19" fill="#244b6e" font-weight="400">OACと顧客認証は別の検証</text>
+<rect x="1610" y="270" width="470" height="185" rx="14" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1632" y="308" font-size="24" fill="#244b6e" font-weight="700">OAC ＋ リソースポリシー</text>
+<text x="1632" y="347" font-size="19" fill="#244b6e" font-weight="400">Regional：SigV4 / always-amz-auth</text>
+<text x="1632" y="376" font-size="19" fill="#244b6e" font-weight="400">利用者のAuthorizationを保持</text>
+<text x="1632" y="405" font-size="19" fill="#244b6e" font-weight="400">対象distributionの呼出しを許可</text>
+<text x="1632" y="434" font-size="19" fill="#244b6e" font-weight="400">署名なしのendpoint直呼びは拒否</text>
+<rect x="2140" y="270" width="485" height="185" rx="14" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="2162" y="308" font-size="24" fill="#244b6e" font-weight="700">CloudFrontの転送設定</text>
+<text x="2162" y="347" font-size="19" fill="#244b6e" font-weight="400">viewerのHostを転送しない</text>
+<text x="2162" y="376" font-size="19" fill="#244b6e" font-weight="400">AllViewerExceptHostHeader等を使用</text>
+<text x="2162" y="405" font-size="19" fill="#244b6e" font-weight="400">必要なHTTPメソッドを許可</text>
+<text x="2162" y="434" font-size="19" fill="#244b6e" font-weight="400">独自ドメイン時：ACMはus-east-1</text>
+<rect x="352.5" y="404" width="79" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="364.5" y="427" font-size="18" fill="#244b6e" font-weight="400">HTTPS</text>
+<rect x="902.5" y="404" width="95" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="914.5" y="427" font-size="18" fill="#244b6e" font-weight="400">OAC署名</text>
+<rect x="616.0" y="619" width="568" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="628.0" y="642" font-size="18" fill="#244b6e" font-weight="400">CloudFront経由でトークン / 202＋jobId / 状態・署名URL</text>
+<rect x="1342.5" y="701" width="195" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="1354.5" y="724" font-size="18" fill="#244b6e" font-weight="400">認証照会・業務処理</text>
+<rect x="2063.0" y="476" width="214" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="2075.0" y="499" font-size="18" fill="#244b6e" font-weight="400">提案：入力を先に保存</text>
+<rect x="450" y="760" width="1180" height="280" rx="14" fill="#f1f5fc" stroke="#a6b9d5" stroke-width="2"/>
+<text x="475" y="802" font-size="24" fill="#244b6e" font-weight="700">Amazon DynamoDB  /  論理データ領域（物理テーブル構成は未決）</text>
+<rect x="475" y="830" width="350" height="170" rx="14" fill="#f0f4fc" stroke="#9bacce" stroke-width="2"/>
+<text x="497" y="868" font-size="24" fill="#244b6e" font-weight="700">Customers / Sessions</text>
+<text x="497" y="907" font-size="19" fill="#244b6e" font-weight="400">顧客照合・有効状態</text>
+<text x="497" y="936" font-size="19" fill="#244b6e" font-weight="400">トークンのハッシュ・期限・失効</text>
+<text x="497" y="965" font-size="19" fill="#244b6e" font-weight="400">各保護APIで検証</text>
+<rect x="850" y="830" width="350" height="170" rx="14" fill="#f0f4fc" stroke="#9bacce" stroke-width="2"/>
+<text x="872" y="868" font-size="24" fill="#244b6e" font-weight="700">Jobs / 冪等性</text>
+<text x="872" y="907" font-size="19" fill="#244b6e" font-weight="400">customerId・状態・採用結果</text>
+<text x="872" y="936" font-size="19" fill="#244b6e" font-weight="400">jobIdとIdempotency-Key</text>
+<text x="872" y="965" font-size="19" fill="#244b6e" font-weight="400">提案：実行権・残量予約</text>
+<rect x="1225" y="830" width="380" height="170" rx="14" fill="#f6f1fc" stroke="#a48abd" stroke-width="2" stroke-dasharray="9 6"/>
+<text x="1247" y="868" font-size="24" fill="#244b6e" font-weight="700">使用量 / Outbox</text>
+<text x="1247" y="907" font-size="19" fill="#244b6e" font-weight="400">使用量・請求記録</text>
+<text x="1247" y="936" font-size="19" fill="#244b6e" font-weight="400">提案：受付とOutboxを原子的登録</text>
+<text x="1247" y="965" font-size="19" fill="#244b6e" font-weight="400">提案：attemptIdで確定・精算</text>
+<rect x="1740" y="760" width="400" height="240" rx="14" fill="#f6f1fc" stroke="#a48abd" stroke-width="2" stroke-dasharray="9 6"/>
+<text x="1762" y="798" font-size="24" fill="#244b6e" font-weight="700">配送 Event Function</text>
+<text x="1762" y="837" font-size="19" fill="#244b6e" font-weight="400">OutboxをStreamsで検知</text>
+<text x="1762" y="866" font-size="19" fill="#244b6e" font-weight="400">jobId・customerIdをSQSへ</text>
+<text x="1762" y="895" font-size="19" fill="#244b6e" font-weight="400">配送状態を更新</text>
+<text x="1762" y="924" font-size="19" fill="#244b6e" font-weight="400">未配送の再走査・回復も設計</text>
+<text x="1762" y="982" font-size="17" fill="#806298" font-weight="700">Outbox・配送処理は提案</text>
+<rect x="2240" y="760" width="385" height="240" rx="14" fill="#f6f1fc" stroke="#a48abd" stroke-width="2" stroke-dasharray="9 6"/>
+<text x="2262" y="798" font-size="24" fill="#244b6e" font-weight="700">Amazon SQS</text>
+<text x="2262" y="837" font-size="19" fill="#244b6e" font-weight="400">Standard Fair Queues</text>
+<text x="2262" y="866" font-size="19" fill="#244b6e" font-weight="400">MessageGroupId＝customerId</text>
+<text x="2262" y="895" font-size="19" fill="#244b6e" font-weight="400">メッセージは重複し得る</text>
+<text x="2262" y="924" font-size="19" fill="#244b6e" font-weight="400">厳密な均等配分・順序保証なし</text>
+<text x="2262" y="982" font-size="17" fill="#806298" font-weight="700">導入推奨・採否は未決</text>
+<polyline points="1630,855 1740,855" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<rect x="1636.5" y="803" width="101" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="1648.5" y="826" font-size="18" fill="#244b6e" font-weight="400">Streams</text>
+<polyline points="1740,960 1630,960" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<polyline points="2140,855 2240,855" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<rect x="2159.0" y="803" width="62" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="2171.0" y="826" font-size="18" fill="#244b6e" font-weight="400">送信</text>
+<polyline points="2335,1000 2335,1055 1940,1055 1940,1120" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<rect x="1945.5" y="1019" width="309" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="1957.5" y="1042" font-size="18" fill="#244b6e" font-weight="400">イベントソース連携・並列数制御</text>
+<polyline points="2530,1000 2530,1060" fill="none" stroke="#9274ae" stroke-width="3" marker-end="url(#purple)" stroke-dasharray="9 6"/>
+<rect x="2390" y="1060" width="235" height="80" rx="14" fill="#f6f1fc" stroke="#a48abd" stroke-width="2" stroke-dasharray="9 6"/>
+<text x="2412" y="1098" font-size="24" fill="#244b6e" font-weight="700">SQS DLQ</text>
+<text x="2408" y="1121" font-size="17" fill="#244b6e" font-weight="400">受信回数上限で移動</text>
+<rect x="1740" y="1120" width="400" height="220" rx="14" fill="#fff5e9" stroke="#e3b16f" stroke-width="2"/>
+<text x="1762" y="1158" font-size="24" fill="#244b6e" font-weight="700">生成 Worker / Event</text>
+<text x="1762" y="1197" font-size="19" fill="#244b6e" font-weight="400">条件付き実行権取得（提案）</text>
+<text x="1762" y="1226" font-size="19" fill="#244b6e" font-weight="400">入力取得 → 推論 → JSON検証</text>
+<text x="1762" y="1255" font-size="19" fill="#244b6e" font-weight="400">結果保存・使用量記録</text>
+<text x="1762" y="1284" font-size="19" fill="#244b6e" font-weight="400">採用結果確定・残量精算（提案）</text>
+<rect x="1180" y="1120" width="420" height="220" rx="14" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1202" y="1158" font-size="24" fill="#244b6e" font-weight="700">Amazon Bedrock</text>
+<text x="1202" y="1197" font-size="19" fill="#244b6e" font-weight="400">モデルへ推論要求</text>
+<text x="1202" y="1226" font-size="19" fill="#244b6e" font-weight="400">生成結果とusageを返す</text>
+<text x="1202" y="1255" font-size="19" fill="#244b6e" font-weight="400">モデル別RPM / TPMを考慮</text>
+<text x="1202" y="1284" font-size="19" fill="#244b6e" font-weight="400">API受付とは別の非同期処理</text>
+<rect x="2240" y="1160" width="385" height="180" rx="14" fill="#f0f7eb" stroke="#a0ba86" stroke-width="2"/>
+<text x="2262" y="1198" font-size="24" fill="#244b6e" font-weight="700">Amazon S3</text>
+<text x="2262" y="1237" font-size="19" fill="#244b6e" font-weight="400">非公開の生成JSONを保存</text>
+<text x="2262" y="1266" font-size="19" fill="#244b6e" font-weight="400">提案：入力・試行別成果物も保存</text>
+<text x="2262" y="1295" font-size="19" fill="#244b6e" font-weight="400">採用結果の参照はJobsで保持</text>
+<polyline points="1740,1215 1600,1215" fill="none" stroke="#427a9e" stroke-width="3" marker-end="url(#blue)" marker-start="url(#blue)"/>
+<rect x="1602.0" y="1164" width="136" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="1614.0" y="1187" font-size="18" fill="#244b6e" font-weight="400">推論・usage</text>
+<polyline points="2140,1260 2240,1260" fill="none" stroke="#427a9e" stroke-width="3" marker-end="url(#blue)" marker-start="url(#blue)"/>
+<rect x="2149.5" y="1209" width="81" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="2161.5" y="1232" font-size="18" fill="#244b6e" font-weight="400">入出力</text>
+<polyline points="1835,1120 1835,1080 1410,1080 1410,1040" fill="none" stroke="#427a9e" stroke-width="3" marker-end="url(#blue)" marker-start="url(#blue)"/>
+<rect x="1404.5" y="1043" width="271" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="1416.5" y="1066" font-size="18" fill="#244b6e" font-weight="400">実行権・状態・使用量・精算</text>
+<rect x="1006.0" y="1344" width="588" height="32" rx="14" fill="#ffffff" stroke="#d8e3ec" stroke-width="2"/>
+<text x="1018.0" y="1367" font-size="18" fill="#244b6e" font-weight="400">④ WPFがS3署名URLで直接ダウンロード（APIのWAFを通らない）</text>
+<rect x="35" y="1460" width="2650" height="130" rx="14" fill="#eaf3fc" stroke="#c3d7e8" stroke-width="2"/>
+<text x="60" y="1497" font-size="24" fill="#244b6e" font-weight="700">認証・受付・照会の流れ</text>
+<text x="60" y="1533" font-size="21" fill="#244b6e" font-weight="400">① 保守キー照合 → 不透明トークン発行・Sessions保存   ② トークン検証 → 入力保存案 → Jobs・冪等性・残量・Outbox登録案 → 202</text>
+<text x="60" y="1569" font-size="21" fill="#244b6e" font-weight="400">③ トークン・所有者を再確認 → 状態／成功時の署名URLを返す   ④ S3からJSON取得。発行済みURLはセッション失効だけでは無効にならない。</text>
+<rect x="35" y="1610" width="1300" height="175" rx="14" fill="#f6f1fc" stroke="#baa7ce" stroke-width="2"/>
+<text x="60" y="1647" font-size="23" fill="#244b6e" font-weight="700">凡例・提案の範囲</text>
+<text x="60" y="1682" font-size="20" fill="#244b6e" font-weight="400">青実線：業務通信・データ操作  ／  紫破線：応答・関連付け・配送提案等</text>
+<text x="60" y="1715" font-size="20" fill="#244b6e" font-weight="400">紫の枠：採否未決。SQS・Outbox・入力保存・予約精算・試行別成果物は提案。</text>
+<text x="60" y="1748" font-size="20" fill="#244b6e" font-weight="400">Web入口も最終選定前。JWT署名鍵は不要。追加CMKは採らない既存方針を継続。</text>
+<rect x="1360" y="1610" width="1325" height="175" rx="14" fill="#f3f7fa" stroke="#b8cbd8" stroke-width="2"/>
+<text x="1385" y="1647" font-size="23" fill="#244b6e" font-weight="700">追跡・監視と図の対象</text>
+<text x="1385" y="1682" font-size="20" fill="#244b6e" font-weight="400">入口のX-Amz-Cf-Idをアプリログにも記録。jobIdを配送・Workerまで引き継ぐ。</text>
+<text x="1385" y="1715" font-size="20" fill="#244b6e" font-weight="400">CloudWatch / CloudTrail / GuardDutyは利用計画。保持・通知等は別途設計。</text>
+<text x="1385" y="1748" font-size="20" fill="#244b6e" font-weight="400">認証情報・入力本文・署名URLはログに出さない。復旧・請求条件はcurrentを参照。</text>
+<text x="40" y="1818" font-size="18" fill="#6b8195" font-weight="400">正本：docs/current/入口方式比較.md・構成設計.md  |  rev4の業務フロー図相当の粒度でWeb案を可視化（既存図は履歴として保持）</text>
+</g></svg>
