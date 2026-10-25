@@ -1,5 +1,7 @@
 # 2026-10-19 非同期BedrockシステムのAPI方式比較・利用量・料金試算
 
+> **過去の比較資料。** [現在の検討状況](../current/検討状況.md)／[最新の入口比較](../current/入口方式比較.md)を参照。今回は不透明トークンを前提とし、料金・性能は未実測です。
+
 > **設計比較のための机上試算。AWSへのデプロイ、性能負荷試験、実測料金はまだない。** 料金は仮の単価・処理時間・稼働時間で計算した参考値。Python/FastAPIの既存資産や移植工数は比較条件から除外する。
 
 ## 1. 今日の結論
@@ -135,4 +137,4 @@ flowchart TD
 - [REST APIとHTTP APIの機能比較](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html)
 - [SQS Fair Queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fair-queues.html)
 
-[ADR-0008: Web Functions比較](../adr/0008_Web-Functions比較.md) / [ADR-0009: SQS公平キュー](../adr/0009_SQS公平キュー導入検討.md) / [構成設計](../構成設計.md)
+[ADR-0008: Web Functions比較](../adr/0008_Web-Functions比較.md) / [ADR-0009: SQS公平キュー](../adr/0009_SQS公平キュー導入検討.md) / [構成設計](../archive/旧設計/構成設計.md)
