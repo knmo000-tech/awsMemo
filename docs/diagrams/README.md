@@ -6,6 +6,8 @@
 
 ### Web Functions案：業務処理・データの流れ
 
+**大枠から読む：** [サービス間のやり取り・概要](AWSシーケンス図_WebFunctions_概要.md) / [概要SVG](AWSシーケンス図_WebFunctions_概要.svg) / [概要draw.io（3ページ）](AWSシーケンス図_WebFunctions_概要.drawio)
+
 [構成図のdraw.io](AWS構成図_WebFunctions.drawio) / [シーケンス図のdraw.io（6ページ）](AWSシーケンス図_WebFunctions.drawio) / [SVGを開く](AWS構成図_WebFunctions_業務フロー.svg) / [シーケンス図・説明](AWSシーケンス図_WebFunctions.md) / [シーケンスSVG全体](AWSシーケンス図_WebFunctions.svg) / [読み方・設定・処理順](AWS構成図_WebFunctions_業務フロー.md)
 
 ![Web Functions案の業務フロー](AWS構成図_WebFunctions_業務フロー.svg)

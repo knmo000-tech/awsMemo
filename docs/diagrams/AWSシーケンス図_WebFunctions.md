@@ -1,5 +1,7 @@
 # Web Functions案：処理シーケンス
 
+**最初に大枠を掴む場合：** [サービス間のやり取り・概要版](AWSシーケンス図_WebFunctions_概要.md)（[SVG](AWSシーケンス図_WebFunctions_概要.svg) / [draw.io](AWSシーケンス図_WebFunctions_概要.drawio)）。このページは細かな仕様を含む詳細版。
+
 作成日：2026-10-26。既存の[業務フロー構成図](AWS構成図_WebFunctions_業務フロー.svg)に対応する。**比較・検証用で、Web入口・SQS・Outbox等の採用確定や実装完了を意味しない。**
 
 [draw.ioで編集（全6ページ）](AWSシーケンス図_WebFunctions.drawio) / [全6図をまとめたSVG](AWSシーケンス図_WebFunctions.svg) / [構成図の読み方](AWS構成図_WebFunctions_業務フロー.md) / [入口方式比較](../current/入口方式比較.md) / [構成設計](../current/構成設計.md) / [図の一覧](README.md)

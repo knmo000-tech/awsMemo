@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1488" viewBox="0 0 2100 1488" role="img" aria-labelledby="title desc">
+<title id="title">3. 結果取得：Workerが保存し、WPFが進捗を確認して取得</title>
+<desc id="desc">Web Functions案の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="1488" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">3. 結果取得：Workerが保存し、WPFが進捗を確認して取得</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Web Functions概要・サービス間のやり取り  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V1388" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">生成Worker</text>
+<rect x="75.0" y="1388" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="1422" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">生成Worker</text>
+<path d="M635.0,180 V1388" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="490.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="635.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<rect x="490.0" y="1388" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="635.0" y="1422" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">S3</text>
+<path d="M1050.0,180 V1388" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="905.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="905.0" y="1388" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="1422" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M1465.0,180 V1388" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1320.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1465.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<rect x="1320.0" y="1388" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1465.0" y="1422" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Web Function</text>
+<path d="M1880.0,180 V1388" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<rect x="1735.0" y="1388" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="1422" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">WPF</text>
+<text x="427.5" y="235" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. 生成したJSONを保存</text>
+<path d="M220.0,255 H635.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="427.5" y="335" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. 保存完了</text>
+<path d="M635.0,355 H220.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="635.0" y="435" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. 完了状態・結果の保存先を記録</text>
+<path d="M220.0,455 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<rect x="1305.0" y="510" width="735.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1672.5" y="540" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">以下のAPI通信は図1と同じCloudFront経由</text>
+<rect x="35" y="611" width="2030" height="50" fill="#e9f1f9"/>
+<text x="51" y="640" text-anchor="start" font-size="21" fill="#244b6e" font-weight="700">loop：完了まで進捗を確認</text>
+<text x="1672.5" y="708" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. jobIdの進捗を問い合わせる</text>
+<path d="M1880.0,728 H1465.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1257.5" y="808" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">5. 認証・所有者・ジョブ状態を</text>
+<text x="1257.5" y="838" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">確認</text>
+<path d="M1465.0,858 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1257.5" y="938" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. 状態・結果の保存先</text>
+<path d="M1050.0,958 H1465.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="1672.5" y="1038" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 進捗、完了時はダウンロード</text>
+<text x="1672.5" y="1068" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">URL</text>
+<path d="M1465.0,1088 H1880.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="1257.5" y="1203" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. 署名URLでJSONを取得</text>
+<path d="M1880.0,1223 H635.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1257.5" y="1303" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 完成したJSON</text>
+<path d="M635.0,1323 H1880.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<rect x="35" y="611" width="2030" height="537" rx="4" fill="none" stroke="#9cb0c2" stroke-width="2"/>
+<text x="40" y="1472" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  概要版：認証・整合性・請求等の詳細は省略</text>
+</g></svg>
