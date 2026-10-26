@@ -1,5 +1,7 @@
 # Web Functions案：サービス間のやり取り・概要
 
+> **検討履歴（2026-10-26）：** Event Functionsを採用したため、この図は現行構成ではない。SVG・draw.io・編集元は履歴として保持する。[採用構成](../current/Event入口構成.md)
+
 **最初に大枠を掴むための図。** 認証の検証方法、冪等性、実行権、再試行、残量・請求などの細かな仕様を省き、サービス間で何を渡すかに絞った。
 
 [全体SVG](AWSシーケンス図_WebFunctions_概要.svg) / [draw.io（3ページ）](AWSシーケンス図_WebFunctions_概要.drawio) / [詳細シーケンス](AWSシーケンス図_WebFunctions.md) / [構成図](AWS構成図_WebFunctions_業務フロー.svg)

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1571" viewBox="0 0 2100 1571" role="img" aria-labelledby="title desc">
+<title id="title">2. 配送・生成：発送待ちをSQSへ届け、Bedrockで生成</title>
+<desc id="desc">Event Functions採用構成の処理順。青い実線は要求、紫の破線は応答。黄色枠は補足。採用未確定の設計提案を含む。</desc>
+<defs><marker id="request" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#427a9e"/></marker><marker id="reply" viewBox="0 0 10 10" markerWidth="7" markerHeight="7" refX="9" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#9274ae"/></marker></defs>
+<rect width="2100" height="1571" fill="#fff"/>
+<g font-family="Noto Sans CJK JP, Hiragino Kaku Gothic ProN, Meiryo, sans-serif">
+<text x="40" y="55" text-anchor="start" font-size="30" fill="#244b6e" font-weight="700">2. 配送・生成：発送待ちをSQSへ届け、Bedrockで生成</text>
+<text x="40" y="94" text-anchor="start" font-size="20" fill="#6b8195" font-weight="400">Event Functions採用・後段の詳細は提案  |  不透明トークン前提  |  SQS・Outbox等は提案  |  2026-10-26</text>
+<path d="M220.0,180 V1471" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="75.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<rect x="75.0" y="1471" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="220.0" y="1505" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">DynamoDB</text>
+<path d="M635.0,180 V1471" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="490.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="635.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">配送Event Function</text>
+<rect x="490.0" y="1471" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="635.0" y="1505" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">配送Event Function</text>
+<path d="M1050.0,180 V1471" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="905.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<rect x="905.0" y="1471" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1050.0" y="1505" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">SQS</text>
+<path d="M1465.0,180 V1471" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1320.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1465.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">生成Worker</text>
+<rect x="1320.0" y="1471" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1465.0" y="1505" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">生成Worker</text>
+<path d="M1880.0,180 V1471" stroke="#9fb4c7" stroke-width="2" stroke-dasharray="7 6"/>
+<rect x="1735.0" y="130" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="164" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Bedrock</text>
+<rect x="1735.0" y="1471" width="290" height="52" rx="9" fill="#edf5fc" stroke="#83aac9" stroke-width="2"/>
+<text x="1880.0" y="1505" text-anchor="middle" font-size="23" fill="#244b6e" font-weight="700">Bedrock</text>
+<text x="427.5" y="235" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">1. Outbox追加を通知（Stream</text>
+<text x="427.5" y="265" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">s経由）</text>
+<path d="M220.0,285 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="427.5" y="365" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">2. 発送待ち記録を確認</text>
+<path d="M635.0,385 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="427.5" y="465" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">3. 配送するjobId等</text>
+<path d="M220.0,485 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="842.5" y="565" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">4. ジョブを送る</text>
+<path d="M635.0,585 H1050.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="842.5" y="665" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">5. 送信受付</text>
+<path d="M1050.0,685 H635.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="427.5" y="765" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">6. 配送済みを記録</text>
+<path d="M635.0,785 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1257.5" y="865" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">7. 待機ジョブを渡す（Lambda連</text>
+<text x="1257.5" y="895" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">携）</text>
+<path d="M1050.0,915 H1465.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="842.5" y="995" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">8. ジョブ情報・入力参照を確認</text>
+<path d="M1465.0,1015 H220.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="842.5" y="1095" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">9. 生成に必要な情報</text>
+<path d="M220.0,1115 H1465.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<text x="1672.5" y="1195" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">10. 入力を渡して生成を依頼</text>
+<path d="M1465.0,1215 H1880.0" fill="none" stroke="#427a9e" stroke-width="2.5" marker-end="url(#request)"/>
+<text x="1672.5" y="1295" text-anchor="middle" font-size="22" fill="#244b6e" font-weight="400">11. 生成結果・使用量</text>
+<path d="M1880.0,1315 H1465.0" fill="none" stroke="#9274ae" stroke-width="2.5" stroke-dasharray="9 6" marker-end="url(#reply)"/>
+<rect x="1305.0" y="1370" width="320.0" height="63" rx="8" fill="#fff8df" stroke="#d7bc71"/>
+<text x="1465.0" y="1400" text-anchor="middle" font-size="21" fill="#68542b" font-weight="400">続いて図3で結果を保存</text>
+<text x="40" y="1555" text-anchor="start" font-size="19" fill="#6b8195" font-weight="400">青実線：要求  ／  紫破線：応答・通知  ／  黄枠：補足  |  概要版：認証・整合性・請求等の詳細は省略</text>
+</g></svg>

@@ -1,10 +1,20 @@
 # 構成図
 
-## 現在の比較用構成図
+## 現行：Event Functions採用構成
 
-[REST API案・Web Functions案の全体構成図](../current/入口方式比較.md)を参照。不透明トークンを前提に、同じ非同期処理・データ管理で比較する。両案とも最終採用前。
+入口は**API Gateway Regional REST API＋WAF＋API Event Function**を採用（2026-10-26）。SQS・Outbox等は引き続き提案。
 
-### Web Functions案：業務処理・データの流れ
+- [採用構成・設定・検証条件](../current/Event入口構成.md)
+- 構成図：[SVG](AWS構成図_EventFunctions_業務フロー.svg) / [draw.io](AWS構成図_EventFunctions.drawio)
+- 概要シーケンス：[説明](AWSシーケンス図_EventFunctions_概要.md) / [SVG](AWSシーケンス図_EventFunctions_概要.svg) / [draw.io・3ページ](AWSシーケンス図_EventFunctions_概要.drawio)
+
+![Event Functions採用構成](AWS構成図_EventFunctions_業務フロー.svg)
+
+## 検討履歴：Web Functions案
+
+**現行構成ではない。** 検討した比較・構成図・SVG・draw.io・編集元を既存パスで保存する。[比較の履歴](../比較検討/2026-10-25_REST-APIとWeb-Functionsの構成比較.md)
+
+### 当時の業務フロー・シーケンス
 
 **大枠から読む：** [サービス間のやり取り・概要](AWSシーケンス図_WebFunctions_概要.md) / [概要SVG](AWSシーケンス図_WebFunctions_概要.svg) / [概要draw.io（3ページ）](AWSシーケンス図_WebFunctions_概要.drawio)
 
@@ -12,7 +22,7 @@
 
 ![Web Functions案の業務フロー](AWS構成図_WebFunctions_業務フロー.svg)
 
-rev4の業務フロー図相当の粒度で、現在の不透明トークン前提を反映。CloudFront＋WAF＋OAC、Web受付、DynamoDB、配送・生成、Bedrock、S3取得を示す。SQS・Outbox等は未承認の提案として明示し、Web案の採用確定を意味しない。
+rev4の業務フロー図相当の粒度で、検討当時の不透明トークン前提を反映。CloudFront＋WAF＋OAC、Web受付、DynamoDB、配送・生成、Bedrock、S3取得を示す。SQS・Outbox等は未承認の提案として明示し、現行の採用構成ではない。
 
 ## 過去の図（履歴）
 

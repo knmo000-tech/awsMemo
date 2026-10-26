@@ -1,8 +1,10 @@
 # Web Functions案：業務処理・データの流れ
 
+> **検討履歴（2026-10-26）：** Event Functionsを採用したため、この図は現行構成ではない。SVG・draw.io・編集元は履歴として保持する。[採用構成](../current/Event入口構成.md)
+
 作成日：2026-10-26。**比較・検証用の設計図であり、採用確定・AWSへの構築完了を意味しない。**
 
-[draw.ioで編集](AWS構成図_WebFunctions.drawio) / [SVGを開く](AWS構成図_WebFunctions_業務フロー.svg) / [シーケンス図](AWSシーケンス図_WebFunctions.md) / [入口方式比較](../current/入口方式比較.md) / [構成設計](../current/構成設計.md) / [図の一覧](README.md)
+[draw.ioで編集](AWS構成図_WebFunctions.drawio) / [SVGを開く](AWS構成図_WebFunctions_業務フロー.svg) / [シーケンス図](AWSシーケンス図_WebFunctions.md) / [入口方式比較](../比較検討/2026-10-25_REST-APIとWeb-Functionsの構成比較.md) / [構成設計](../current/構成設計.md) / [図の一覧](README.md)
 
 ![Web Functions案の業務フロー](AWS構成図_WebFunctions_業務フロー.svg)
 
