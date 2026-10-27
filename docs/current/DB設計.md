@@ -44,25 +44,25 @@ erDiagram
         number expiresAt
     }
     Jobs {
-        string PK PK "CUSTOMER識別子"
-        string SK PK "JOB・IDEMP・ATTEMPT"
+        string partitionKey PK "CUSTOMER識別子"
+        string sortKey PK "JOB・IDEMP・ATTEMPT"
         string creditRuleVersion
     }
     Dispatch {
-        string PK PK "JOB識別子"
-        string SK PK "EVENT識別子"
+        string partitionKey PK "JOB識別子"
+        string sortKey PK "EVENT識別子"
     }
     UsageEvents {
-        string PK PK "JOB識別子"
-        string SK PK "ATTEMPT・CALL識別子"
+        string partitionKey PK "JOB識別子"
+        string sortKey PK "ATTEMPT・CALL識別子"
     }
     Credits {
-        string PK PK "CUSTOMER識別子"
-        string SK PK "WALLET・RESERVATION・ENTRY"
+        string partitionKey PK "CUSTOMER識別子"
+        string sortKey PK "WALLET・RESERVATION・ENTRY"
     }
     CreditRules {
-        string PK PK "RULESET識別子"
-        string SK PK "ACTIVE・VERSION"
+        string partitionKey PK "RULESET識別子"
+        string sortKey PK "ACTIVE・VERSION"
     }
 ```
 
