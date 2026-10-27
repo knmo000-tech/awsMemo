@@ -24,6 +24,7 @@
 | 採用したEvent入口・構成図 | [Event入口構成](docs/current/Event入口構成.md) |
 | 不透明トークンを使う構成・処理 | [構成設計](docs/current/構成設計.md) |
 | DBのテーブル・ER図・キー・更新条件 | [DB設計案](docs/current/DB設計.md) |
+| RDBとDynamoDBの違い・PK/SK・CRUD例 | [共有用HTML](docs/learning/RDBとDynamoDBの違い_CRUD解説.html) |
 | 次に進める3つの作業・承認対象 | [次の作業](docs/current/次の作業.md) |
 | 各サービスで決めること（詳細チェックリスト） | [61項目の決定事項一覧](docs/current/決定事項一覧.md) |
 | 判断の理由・変更履歴 | [ADR](docs/adr/README.md) |
